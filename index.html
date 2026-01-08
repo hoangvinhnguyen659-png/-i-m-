@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Điểm Cộng</title>
+    <style>
+        /* CSS: Phần trang trí giao diện */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        input, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            flex: 1;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .total-score {
+            text-align: right;
+            margin-top: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📝 Quản Lý Điểm Cộng</h1>
+
+    <div class="input-group">
+        <input type="text" id="studentName" placeholder="Tên thành viên/Học sinh">
+        <input type="number" id="points" placeholder="Số điểm (+/-)">
+        <input type="text" id="reason" placeholder="Lý do (Ví dụ: Phát biểu tốt)">
+        <button onclick="addPoint()">Thêm điểm</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Thời gian</th>
+                <th>Họ và Tên</th>
+                <th>Điểm</th>
+                <th>Lý do</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody id="scoreTableBody">
+            </tbody>
+    </table>
+    
+    <div class="total-score" id="totalScoreDisplay">Tổng điểm ghi nhận: 0</div>
+</div>
+
+<script>
+    // JavaScript: Phần xử lý logic
+
+    // Khi trang web tải xong, hãy hiển thị dữ liệu cũ (nếu có)
+    document.addEventListener('DOMContentLoaded', loadData);
+
+    function addPoint() {
+        // 1. Lấy giá trị từ các ô nhập liệu
+        const name = document.getElementById('studentName').value;
+        const points = document.getElementById('points').value;
+        const reason = document.getElementById('reason').value;
+
+        // 2. Kiểm tra xem người dùng đã nhập đủ chưa
+        if (name === '' || points === '') {
+            alert("Vui lòng nhập tên và số điểm!");
+            return;
+        }
+
+        // 3. Tạo đối tượng chứa thông tin
+        const entry = {
+            id: Date.now(), // Tạo ID duy nhất dựa trên thời gian
+            date: new Date().toLocaleString('vi-VN'),
+            name: name,
+            points: parseInt(points),
+            reason: reason || 'Không có ghi chú'
+        };
+
+        // 4. Lưu vào LocalStorage
+        saveToLocalStorage(entry);
+
+        // 5. Hiển thị lên bảng và xóa ô nhập
+        renderTable();
+        clearInputs();
+    }
+
+    function saveToLocalStorage(entry) {
+        let data = JSON.parse(localStorage.getItem('scoreData')) || [];
+        data.push(entry);
+        localStorage.setItem('scoreData', JSON.stringify(data));
+    }
+
+    function loadData() {
+        renderTable();
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('scoreTableBody');
+        tbody.innerHTML = ''; // Xóa bảng cũ để vẽ lại
+        let data = JSON.parse(localStorage.getItem('scoreData')) || [];
+        let total = 0;
+
+        // Duyệt qua từng bản ghi để tạo hàng trong bảng
+        data.forEach((item, index) => {
+            total += item.points;
+            
+            let row = `<tr>
+                <td>${item.date}</td>
+                <td><strong>${item.name}</strong></td>
+                <td style="color: ${item.points >= 0 ? 'green' : 'red'}">${item.points > 0 ? '+' : ''}${item.points}</td>
+                <td>${item.reason}</td>
+                <td><button class="delete-btn" onclick="deleteEntry(${index})">Xóa</button></td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+
+        // Cập nhật tổng điểm hiển thị (chỉ mang tính tham khảo tổng quan)
+        document.getElementById('totalScoreDisplay').innerText = `Tổng điểm ghi nhận: ${total}`;
+    }
+
+    function deleteEntry(index) {
+        if(confirm('Bạn có chắc muốn xóa dòng này không?')) {
+            let data = JSON.parse(localStorage.getItem('scoreData')) || [];
+            data.splice(index, 1); // Xóa phần tử tại vị trí index
+            localStorage.setItem('scoreData', JSON.stringify(data));
+            renderTable(); // Vẽ lại bảng
+        }
+    }
+
+    function clearInputs() {
+        document.getElementById('studentName').value = '';
+        document.getElementById('points').value = '';
+        document.getElementById('reason').value = '';
+        document.getElementById('studentName').focus(); // Đưa con trỏ chuột về ô nhập tên
+    }
+</script>
+
+</body>
+</html>
