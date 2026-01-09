@@ -35,7 +35,53 @@ const SUBJECTS = [
     { id: 'Khác', name: 'Hoạt động khác', icon: 'ri-star-smile-line', adminOnly: true }
 ];
 
-const TOTAL_STUDENTS = 42;
+[span_0](start_span)// DANH SÁCH HỌC SINH MỚI (42 Em)[span_0](end_span)
+const STUDENT_NAMES = [
+    "Nguyễn Ngọc Quỳnh An",
+    "Trần Bình An",
+    "Nguyễn Ngọc Nguyên Anh",
+    "Trần Hoàng Anh",
+    "Nguyễn Châu Thái Bảo",
+    "Phan Trung Can",
+    "Nguyễn Minh Đạt",
+    "Lê Nguyễn Hồng Đăng",
+    "Mai Hoàng Gia",
+    "Phan Nguyễn Ngọc Hân",
+    "Lương Minh Hiếu",
+    "Hồ Hoàng Huy",
+    "Nguyễn Bùi Minh Huy",
+    "Võ Thanh Huy",
+    "Trần Như Huỳnh",
+    "Nguyễn Duy Khang",
+    "Phan Duy Khang",
+    "Võ Anh Khoa",
+    "Nguyễn Hoài Linh",
+    "Bùi Văn Lộc",
+    "Nguyễn Ngọc Minh",
+    "Thái Nguyễn Bình Minh",
+    "Lê Kim Ngân",
+    "Nguyễn Thị Kim Ngân",
+    "Phạm Thị Mỹ Ngân",
+    "Triệu Thu Ngân",
+    "Nguyễn Minh Nghĩa",
+    "Phạm Trần Thảo Nguyên",
+    "Nguyễn Thị Ánh Nguyệt",
+    "Lê Lâm Nhật",
+    "Nguyễn Tiết Nhi",
+    "Trần Thị Thảo Như",
+    "Trương Gia Phú",
+    "Nguyễn Phú Sang",
+    "Nguyễn Huy Thế",
+    "Lê Hoàng Thông",
+    "Nguyễn Ngọc Bảo Thy",
+    "Trần Hoàng Tiến",
+    "Bùi Kiều Trang",
+    "Lê Thị Bảo Trân",
+    "Nguyễn Thị Ngọc Tuyền",
+    "Nguyễn Thị Khánh Vân" 
+];
+
+const TOTAL_STUDENTS = STUDENT_NAMES.length;
 let currentUser = null; 
 let classData = {}; 
 let currentStudentId = "";
@@ -57,6 +103,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Sự kiện tìm kiếm học sinh
+    const searchInput = document.getElementById('student-search');
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('.student-row');
+        
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name-clean');
+            // Tìm kiếm không dấu
+            const termClean = removeVietnameseTones(term);
+            if (name.includes(termClean)) {
+                row.style.display = 'flex';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
     // Thêm sự kiện nhấn Enter cho ô nhập liệu đăng nhập
     const loginInputs = [document.getElementById('login-username'), document.getElementById('password-input')];
     loginInputs.forEach(input => {
@@ -67,6 +131,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+// Hàm hỗ trợ xóa dấu tiếng Việt để tìm kiếm
+function removeVietnameseTones(str) {
+    str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g,"a"); 
+    str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g,"e"); 
+    str = str.replace(/ì|í|ị|ỉ|ĩ/g,"i"); 
+    str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g,"o"); 
+    str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g,"u"); 
+    str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g,"y"); 
+    str = str.replace(/đ/g,"d");
+    str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
+    str = str.replace(/È|É|Ẹ|Ẻ|ẽ|Ê|Ề|Ế|Ệ|ể|Ễ/g, "E");
+    str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
+    str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
+    str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
+    str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
+    str = str.replace(/Đ/g, "D");
+    return str.toLowerCase();
+}
 
 function showToast(message) {
     const container = document.getElementById('toast-container');
@@ -154,6 +237,10 @@ window.openSubject = function(subjectObj) {
     document.getElementById('dashboard-view').style.display = 'none';
     document.getElementById('detail-view').style.display = 'block';
     document.getElementById('current-subject-badge').innerText = subjectObj.name;
+    
+    // Reset thanh tìm kiếm khi mở môn học mới
+    document.getElementById('student-search').value = "";
+    
     renderStudentList(subjectObj);
 }
 
@@ -168,13 +255,16 @@ window.renderStudentList = function(subjectObj) {
     listContainer.innerHTML = ""; 
     const fragment = document.createDocumentFragment();
 
-    for (let i = 1; i <= TOTAL_STUDENTS; i++) {
-        const studentId = `student_${i}`;
-        const name = `Học sinh ${i}`;
+    for (let i = 0; i < TOTAL_STUDENTS; i++) {
+        const studentIndex = i + 1; // ID vẫn giữ nguyên là student_1 -> student_42
+        const studentId = `student_${studentIndex}`;
+        const name = STUDENT_NAMES[i]; // Lấy tên thật từ mảng
         const total = calculateTotal(studentId, subjectObj.id);
         
         const row = document.createElement('div');
         row.className = 'student-row';
+        // Lưu tên không dấu vào attribute để tìm kiếm nhanh
+        row.setAttribute('data-name-clean', removeVietnameseTones(name));
         row.onclick = () => openOptionModal(studentId, name);
 
         let scoreClass = 'neu';
@@ -184,7 +274,7 @@ window.renderStudentList = function(subjectObj) {
         const displayScore = (total > 0 ? '+' : '') + total;
 
         row.innerHTML = `
-            <span class="s-name">${name}</span>
+            <span class="s-name">${studentIndex}. ${name}</span>
             <span class="s-score ${scoreClass}">${displayScore}</span>
         `;
         fragment.appendChild(row);
