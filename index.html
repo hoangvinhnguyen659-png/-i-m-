@@ -22,7 +22,7 @@
             <span>Tổng điểm</span>
         </div>
         <div id="student-list" class="list-container">
-            <div class="loading">Đang tải dữ liệu từ vệ tinh...</div>
+            <div class="loading">Đang kết nối dữ liệu...</div>
         </div>
     </main>
 
@@ -31,8 +31,8 @@
             <span class="close-btn" onclick="closeModal('modal-login')">&times;</span>
             <h2>Xác thực Admin</h2>
             <input type="password" id="password-input" placeholder="Nhập mật khẩu">
-            <button class="btn-primary full-width" onclick="performLogin()">Đăng nhập</button>
-            <p id="login-error" class="error-text">Mật khẩu không đúng</p>
+            <button class="btn-primary full-width" onclick="performLogin()">Xác nhận</button>
+            <p id="login-error" class="error-text">Mật khẩu không chính xác!</p>
         </div>
     </div>
 
@@ -42,7 +42,7 @@
             <h2 id="opt-student-name" class="highlight-text"></h2>
             <div class="action-buttons">
                 <button class="btn-primary full-width" onclick="checkPermissionAndShowAdd()">Nhập điểm mới</button>
-                <button class="btn-info full-width" onclick="viewHistory()">Lịch sử & Xóa</button>
+                <button class="btn-info full-width" onclick="viewHistory()">Xem lịch sử & Xóa</button>
             </div>
         </div>
     </div>
@@ -50,7 +50,7 @@
     <div id="modal-add" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-add')">&times;</span>
-            <h2>Nhập điểm cho: <span id="add-student-name" style="color: var(--primary-color)"></span></h2>
+            <h2>Nhập điểm: <span id="add-student-name" style="color: var(--primary-color)"></span></h2>
             
             <div class="score-type-switch">
                 <button id="btn-plus" class="type-btn active" onclick="setScoreType('plus')">Điểm Cộng (+)</button>
@@ -59,12 +59,12 @@
 
             <div class="form-group">
                 <label>Số điểm:</label>
-                <input type="number" id="score-input" placeholder="Nhập số điểm" inputmode="decimal" step="0.1">
+                <input type="number" id="score-input" placeholder="0.5" inputmode="decimal" step="0.1">
             </div>
 
             <div class="form-group">
                 <label>Lý do:</label>
-                <input type="text" id="reason-input" placeholder="Lý do cộng/trừ...">
+                <input type="text" id="reason-input" placeholder="Nhập lý do tại đây...">
             </div>
 
             <div class="modal-footer">
@@ -77,13 +77,13 @@
     <div id="modal-history" class="modal">
         <div class="modal-content large-modal">
             <span class="close-btn" onclick="closeModal('modal-history')">&times;</span>
-            <h2>Lịch sử: <span id="hist-student-name"></span></h2>
+            <h2>Lịch sử điểm: <span id="hist-student-name"></span></h2>
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
-                            <th>Ngày giờ</th>
-                            <th>Lý do</th>
+                            <th>Thời gian</th>
+                            <th>Nội dung</th>
                             <th class="text-right">Điểm</th>
                             <th class="text-center">Xóa</th>
                         </tr>
