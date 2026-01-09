@@ -1,81 +1,91 @@
-// --- CẤU HÌNH ---
-const CONFIG = {
-    password: "1234",  // Mật khẩu Admin
-    totalStudents: 42  // Số lượng học sinh
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+// ĐÃ DÁN MÃ FIREBASE CỦA BẠN VÀO ĐÂY
+const firebaseConfig = {
+  apiKey: "AIzaSyB7eohUunH5fip0MXPDKVuPl9ZUx7dVGJc",
+  authDomain: "diem-6f691.firebaseapp.com",
+  databaseURL: "https://diem-6f691-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "diem-6f691",
+  storageBucket: "diem-6f691.firebasestorage.app",
+  messagingSenderId: "474870778720",
+  appId: "1:474870778720:web:be653045215280cfab2c05"
 };
 
-// --- TRẠNG THÁI ỨNG DỤNG ---
-let isAdmin = false; // Mặc định là khách (chưa đăng nhập)
-let currentStudent = "";
-let classData = JSON.parse(localStorage.getItem('classData')) || {};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-// Tạo danh sách tên (Bạn có thể sửa trực tiếp tên ở đây sau này)
+const ADMIN_PASS = "1234"; 
+const TOTAL_STUDENTS = 42;
+
+let isAdmin = false;
+let currentStudentId = "";
+let currentScoreType = "plus"; 
+let classData = {}; 
+
 let studentList = [];
-for (let i = 1; i <= CONFIG.totalStudents; i++) {
+for (let i = 1; i <= TOTAL_STUDENTS; i++) {
     studentList.push(`Học sinh ${i}`);
 }
 
-// --- KHỞI TẠO ỨNG DỤNG ---
 document.addEventListener('DOMContentLoaded', () => {
-    renderGrid();
-    updateAuthUI();
+    const dataRef = ref(db, 'students');
+    onValue(dataRef, (snapshot) => {
+        classData = snapshot.val() || {};
+        renderList();
+    });
+    setScoreType('plus');
 });
 
-// --- PHẦN 1: GIAO DIỆN CHÍNH ---
+function renderList() {
+    const listContainer = document.getElementById('student-list');
+    listContainer.innerHTML = ""; 
 
-function renderGrid() {
-    const grid = document.getElementById('grid-container');
-    grid.innerHTML = ""; // Xóa cũ vẽ mới
+    studentList.forEach((name, index) => {
+        const studentId = `student_${index + 1}`;
+        const total = calculateTotal(studentId);
+        const row = document.createElement('div');
+        row.className = 'student-row';
+        row.onclick = () => openOptionModal(studentId, name);
 
-    studentList.forEach(name => {
-        const total = calculateTotal(name);
-        const card = document.createElement('div');
-        card.className = 'student-card';
-        // Khi click vào thẻ tên, mở modal lựa chọn
-        card.onclick = () => openOptionModal(name);
+        let scoreClass = 'score-zero';
+        if (total > 0) scoreClass = 'score-pos';
+        if (total < 0) scoreClass = 'score-neg';
 
-        const scoreClass = total >= 0 ? 'score-positive' : 'score-negative';
-        
-        card.innerHTML = `
-            <span class="student-name">${name}</span>
-            <span class="student-total">Tổng: <span class="${scoreClass}">${total}</span></span>
+        row.innerHTML = `
+            <span class="s-name">${name}</span>
+            <span class="s-score ${scoreClass}">${total}</span>
         `;
-        grid.appendChild(card);
+        listContainer.appendChild(row);
     });
 }
 
-function calculateTotal(name) {
-    if (!classData[name]) return 0;
-    // Tính tổng và làm tròn 2 chữ số thập phân
-    let total = classData[name].reduce((sum, item) => sum + item.score, 0);
+function calculateTotal(studentId) {
+    if (!classData[studentId]) return 0;
+    const records = Object.values(classData[studentId]);
+    let total = records.reduce((sum, item) => sum + item.score, 0);
     return Math.round(total * 100) / 100;
 }
 
-// --- PHẦN 2: XỬ LÝ ĐĂNG NHẬP / ĐĂNG XUẤT ---
-
-function toggleLoginState() {
+window.handleAuthAction = function() {
     if (isAdmin) {
-        // Nếu đang là Admin -> Đăng xuất
-        isAdmin = false;
-        alert("Đã đăng xuất chế độ Admin.");
-        updateAuthUI();
+        if(confirm("Xác nhận đăng xuất?")) {
+            isAdmin = false;
+            updateAuthUI();
+        }
     } else {
-        // Nếu chưa đăng nhập -> Mở modal đăng nhập
         document.getElementById('modal-login').style.display = 'block';
-        document.getElementById('password-input').value = '';
-        document.getElementById('login-error').style.display = 'none';
         document.getElementById('password-input').focus();
     }
 }
 
-function performLogin() {
+window.performLogin = function() {
     const input = document.getElementById('password-input').value;
-    if (input === CONFIG.password) {
+    if (input === ADMIN_PASS) {
         isAdmin = true;
         closeModal('modal-login');
         updateAuthUI();
-        // Nếu người dùng đang cố nhập điểm mà bị chặn, giờ tự động mở lại modal nhập điểm?
-        // Đơn giản là thông báo thành công.
+        document.getElementById('password-input').value = "";
     } else {
         document.getElementById('login-error').style.display = 'block';
     }
@@ -83,115 +93,85 @@ function performLogin() {
 
 function updateAuthUI() {
     const btn = document.getElementById('auth-btn');
-    if (isAdmin) {
-        btn.textContent = "Đăng xuất (Admin)";
-        btn.style.backgroundColor = "#e74c3c";
-        btn.style.color = "white";
-        btn.style.borderColor = "#e74c3c";
-    } else {
-        btn.textContent = "Đăng nhập Giáo Viên";
-        btn.style.backgroundColor = "transparent";
-        btn.style.color = "var(--primary-color)";
-        btn.style.borderColor = "var(--primary-color)";
-    }
+    btn.textContent = isAdmin ? "Đăng xuất" : "Đăng nhập";
+    btn.className = isAdmin ? "btn-outline btn-admin-active" : "btn-outline";
 }
 
-// --- PHẦN 3: LOGIC CÁC MODAL ---
-
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
+window.closeModal = function(id) {
+    document.getElementById(id).style.display = 'none';
 }
 
-function openOptionModal(name) {
-    currentStudent = name;
+window.openOptionModal = function(id, name) {
+    currentStudentId = id;
     document.getElementById('opt-student-name').innerText = name;
     document.getElementById('modal-options').style.display = 'block';
 }
 
-// Kiểm tra quyền: Nếu chưa đăng nhập thì bắt đăng nhập
-function checkPermissionAndShowAdd() {
-    closeModal('modal-options'); // Đóng menu chọn
+window.checkPermissionAndShowAdd = function() {
+    closeModal('modal-options');
     if (isAdmin) {
-        showAddScoreModal();
+        document.getElementById('modal-add').style.display = 'block';
+        document.getElementById('add-student-name').innerText = document.getElementById('opt-student-name').innerText;
+        document.getElementById('score-input').value = "";
+        document.getElementById('reason-input').value = "";
+        setScoreType('plus');
     } else {
-        // Mở modal đăng nhập
-        toggleLoginState();
-        // Gợi ý: Sau này có thể nâng cấp để tự động mở lại modal nhập điểm sau khi login
+        handleAuthAction();
     }
 }
 
-function showAddScoreModal() {
-    document.getElementById('modal-add').style.display = 'block';
-    document.getElementById('add-student-name').innerText = currentStudent;
-    document.getElementById('score-input').value = "";
-    document.getElementById('reason-input').value = "";
-    document.getElementById('score-input').focus();
+window.setScoreType = function(type) {
+    currentScoreType = type;
+    document.getElementById('btn-plus').className = type === 'plus' ? 'type-btn active' : 'type-btn';
+    document.getElementById('btn-minus').className = type === 'minus' ? 'type-btn active' : 'type-btn';
 }
 
-function viewHistory() {
+window.saveScore = function() {
+    let scoreInput = document.getElementById('score-input').value;
+    if (!scoreInput) return alert("Vui lòng nhập số điểm!");
+    
+    let score = Math.abs(parseFloat(scoreInput));
+    if (currentScoreType === 'minus') score = -score;
+
+    const studentRef = ref(db, `students/${currentStudentId}`);
+    push(studentRef, {
+        score: score,
+        reason: document.getElementById('reason-input').value || "Không có lý do",
+        date: new Date().toLocaleString('vi-VN')
+    }).then(() => closeModal('modal-add'));
+}
+
+window.viewHistory = function() {
     closeModal('modal-options');
     document.getElementById('modal-history').style.display = 'block';
-    document.getElementById('hist-student-name').innerText = currentStudent;
+    document.getElementById('hist-student-name').innerText = document.getElementById('opt-student-name').innerText;
     
     const tbody = document.getElementById('history-body');
+    const studentData = classData[currentStudentId];
+    
     tbody.innerHTML = "";
-    
-    const history = classData[currentStudent] || [];
-    
-    if (history.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='3' style='text-align:center'>Chưa có lịch sử</td></tr>";
-    } else {
-        // Đảo ngược để xem cái mới nhất trước
-        [...history].reverse().forEach(item => {
-            const color = item.score >= 0 ? 'green' : 'red';
-            const sign = item.score > 0 ? '+' : '';
-            const row = `
-                <tr>
-                    <td>${item.date}</td>
-                    <td>${item.reason}</td>
-                    <td style="color:${color}; font-weight:bold; text-align:right">${sign}${item.score}</td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
-        });
-    }
-}
-
-// --- PHẦN 4: LƯU DỮ LIỆU ---
-
-function saveScore() {
-    let scoreInput = document.getElementById('score-input').value;
-    const reason = document.getElementById('reason-input').value || "Không có lý do";
-
-    // Xử lý dấu phẩy và dấu chấm
-    scoreInput = scoreInput.replace(',', '.');
-    const score = parseFloat(scoreInput);
-
-    if (isNaN(score)) {
-        alert("Vui lòng nhập số hợp lệ!");
+    if (!studentData) {
+        tbody.innerHTML = "<tr><td colspan='4' style='text-align:center'>Chưa có dữ liệu</td></tr>";
         return;
     }
 
-    const newEntry = {
-        score: score,
-        reason: reason,
-        date: new Date().toLocaleString('vi-VN')
-    };
-
-    if (!classData[currentStudent]) {
-        classData[currentStudent] = [];
-    }
-
-    classData[currentStudent].push(newEntry);
-    localStorage.setItem('classData', JSON.stringify(classData));
-
-    closeModal('modal-add');
-    renderGrid(); // Cập nhật lại giao diện
+    Object.entries(studentData).reverse().forEach(([key, item]) => {
+        const color = item.score >= 0 ? 'var(--success-color)' : 'var(--danger-color)';
+        const deleteBtn = isAdmin ? `<button class="btn-del" onclick="deleteScore('${key}')">🗑️</button>` : '';
+        tbody.innerHTML += `
+            <tr>
+                <td><small>${item.date}</small></td>
+                <td>${item.reason}</td>
+                <td style="color:${color}; font-weight:bold; text-align:right">${item.score > 0 ? '+' : ''}${item.score}</td>
+                <td style="text-align:center">${deleteBtn}</td>
+            </tr>`;
+    });
 }
 
-// Đóng modal khi click ra ngoài vùng trắng
-window.onclick = function(event) {
-    if (event.target.classList.contains('modal')) {
-        event.target.style.display = "none";
+window.deleteScore = function(recordId) {
+    if(confirm("Xác nhận xóa điểm này?")) {
+        remove(ref(db, `students/${currentStudentId}/${recordId}`)).then(() => viewHistory());
     }
 }
+
+window.onclick = (e) => { if (e.target.classList.contains('modal')) closeModal(e.target.id); }
