@@ -1,5 +1,5 @@
 :root {
-    --primary-color: #007AFF; /* Xanh kiểu iOS */
+    --primary-color: #007AFF;
     --success-color: #34C759;
     --danger-color: #FF3B30;
     --bg-color: #F2F2F7;
@@ -13,111 +13,85 @@ body {
     background-color: var(--bg-color);
     margin: 0; padding: 0;
     color: var(--text-main);
-    -webkit-tap-highlight-color: transparent;
 }
 
-/* Header */
 header {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    padding: 15px 20px;
+    background: white; padding: 15px 20px;
     position: sticky; top: 0; z-index: 100;
     border-bottom: 1px solid #E5E5EA;
 }
+
 .header-content {
-    max-width: 800px; margin: 0 auto;
+    max-width: 600px; margin: 0 auto;
     display: flex; justify-content: space-between; align-items: center;
 }
-h3 { margin: 0; font-weight: 700; color: var(--primary-color); }
 
-/* Main List Layout */
-main { max-width: 800px; margin: 20px auto; padding: 0 15px; }
+main { max-width: 600px; margin: 20px auto; padding: 0 15px; }
 
 .list-header {
     display: flex; justify-content: space-between;
-    padding: 0 15px 10px 15px;
-    font-weight: 600; color: var(--text-sub); font-size: 0.9rem;
+    padding: 10px 15px; font-weight: 600; color: var(--text-sub);
 }
 
 .list-container {
-    background: var(--card-bg);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    overflow: hidden;
+    background: white; border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
 .student-row {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 18px 20px;
-    border-bottom: 1px solid #F2F2F7;
+    padding: 15px 20px; border-bottom: 1px solid #F2F2F7;
     cursor: pointer;
-    transition: background 0.2s;
 }
-.student-row:last-child { border-bottom: none; }
-.student-row:hover { background-color: #F9F9F9; }
 
-.s-name { font-weight: 600; font-size: 1rem; color: var(--text-main); }
+.s-name { font-weight: 600; }
 .s-score { font-weight: 700; font-size: 1.1rem; }
 .score-pos { color: var(--success-color); }
 .score-neg { color: var(--danger-color); }
-.score-zero { color: var(--text-sub); }
 
-.loading { padding: 20px; text-align: center; color: var(--text-sub); }
-
-/* Modal */
 .modal {
     display: none; position: fixed; z-index: 1000;
     left: 0; top: 0; width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.4);
-    backdrop-filter: blur(3px);
+    background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
 }
+
 .modal-content {
-    background-color: #fff; margin: 15vh auto; padding: 25px;
-    border-radius: 20px; width: 90%; position: relative;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    background: white; margin: 10vh auto; padding: 25px;
+    border-radius: 20px; width: 85%; max-width: 500px;
+    position: relative;
 }
-@keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
 .small-modal { max-width: 320px; }
-.large-modal { max-width: 600px; }
-.close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #C7C7CC; cursor: pointer; }
 
-/* Buttons & Inputs */
+.close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #CCC; cursor: pointer; }
+
 input {
-    width: 100%; padding: 14px; margin: 10px 0;
-    border: 1px solid #E5E5EA; border-radius: 10px;
-    font-size: 16px; box-sizing: border-box; outline: none;
-    font-family: inherit;
+    width: 100%; padding: 12px; margin: 10px 0;
+    border: 1px solid #DDD; border-radius: 10px; font-size: 16px;
+    box-sizing: border-box;
 }
-input:focus { border-color: var(--primary-color); }
 
-button {
-    padding: 12px 20px; border-radius: 10px; border: none;
-    font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
-}
-.full-width { width: 100%; margin-bottom: 10px; }
-.btn-primary { background-color: var(--primary-color); color: white; }
-.btn-secondary { background-color: #E5E5EA; color: var(--text-main); }
-.btn-info { background-color: #EBF3FF; color: var(--primary-color); }
-.btn-outline { background: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 6px 16px; font-size: 13px; }
-.btn-danger-text { color: var(--danger-color); background: none; border: none; padding: 5px; }
-
-/* Toggle Switch (Cộng/Trừ) */
 .score-type-switch { display: flex; gap: 10px; margin-bottom: 15px; }
-.type-btn { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #E5E5EA; background: #fff; color: var(--text-sub); }
-.type-btn.active { border-color: transparent; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.type-btn {
+    flex: 1; padding: 12px; border-radius: 10px;
+    border: 1px solid #DDD; background: white; color: var(--text-sub);
+}
 
-/* Màu khi active */
-#btn-plus.active { background-color: var(--success-color); }
-#btn-minus.active { background-color: var(--danger-color); }
+.type-btn.active { color: white; border: none; }
+#btn-plus.active { background: var(--success-color); }
+#btn-minus.active { background: var(--danger-color); }
 
-/* Table */
-.table-wrapper { max-height: 350px; overflow-y: auto; margin-top: 15px; }
-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-th { text-align: left; color: var(--text-sub); padding: 10px; font-size: 0.8rem; text-transform: uppercase; }
-td { padding: 12px 10px; border-bottom: 1px solid #F2F2F7; }
+button { padding: 12px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; }
+.btn-primary { background: var(--primary-color); color: white; }
+.btn-secondary { background: #E5E5EA; }
+.btn-info { background: #F2F2F7; color: var(--primary-color); }
+.btn-outline { background: none; border: 1px solid var(--primary-color); color: var(--primary-color); }
+.full-width { width: 100%; margin-bottom: 10px; }
+
+.table-wrapper { max-height: 300px; overflow-y: auto; }
+table { width: 100%; border-collapse: collapse; }
+td, th { padding: 10px; border-bottom: 1px solid #EEE; text-align: left; }
 .text-right { text-align: right; }
 .text-center { text-align: center; }
-.error-text { color: var(--danger-color); display: none; margin-top: 10px; text-align: center;}
-.modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.btn-del { background: none; color: var(--danger-color); font-size: 18px; }
+.error-text { color: var(--danger-color); display: none; text-align: center; }
