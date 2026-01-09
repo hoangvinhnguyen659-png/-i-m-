@@ -14,6 +14,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+[span_1](start_span)// Danh sách 42 học sinh từ file của bạn[span_1](end_span)
+const STUDENT_NAMES = [
+    "Nguyễn Ngọc Quỳnh An", "Trần Bình An", "Nguyễn Ngọc Nguyên Anh", "Trần Hoàng Anh",
+    "Nguyễn Châu Thái Bảo", "Phan Trung Can", "Nguyễn Minh Đạt", "Lê Nguyễn Hồng Đăng",
+    "Mai Hoàng Gia", "Phan Nguyễn Ngọc Hân", "Lương Minh Hiếu", "Hồ Hoàng Huy",
+    "Nguyễn Bùi Minh Huy", "Võ Thanh Huy", "Trần Như Huỳnh", "Nguyễn Duy Khang",
+    "Phan Duy Khang", "Võ Anh Khoa", "Nguyễn Hoài Linh", "Bùi Văn Lộc",
+    "Nguyễn Ngọc Minh", "Thái Nguyễn Bình Minh", "Lê Kim Ngân", "Nguyễn Thị Kim Ngân",
+    "Phạm Thị Mỹ Ngân", "Triệu Thu Ngân", "Nguyễn Minh Nghĩa", "Phạm Trần Thảo Nguyên",
+    "Nguyễn Thị Ánh Nguyệt", "Lê Lâm Nhật", "Nguyễn Tiết Nhi", "Trần Thị Thảo Như",
+    "Trương Gia Phú", "Nguyễn Phú Sang", "Nguyễn Huy Thế", "Lê Hoàng Thông",
+    "Nguyễn Ngọc Bảo Thy", "Trần Hoàng Tiến", "Bùi Kiều Trang", "Lê Thị Bảo Trân",
+    "Nguyễn Thị Ngọc Tuyền", "Nguyễn Thị Khánh Vân"
+];
+
 const ACCOUNTS = {
     'admin': { pass: '1528', name: 'Quản trị viên' },
     'to1': { pass: '5828', name: 'Tổ 1' },
@@ -57,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Thêm sự kiện nhấn Enter cho ô nhập liệu đăng nhập
     const loginInputs = [document.getElementById('login-username'), document.getElementById('password-input')];
     loginInputs.forEach(input => {
         input.addEventListener('keydown', (event) => {
@@ -170,7 +184,10 @@ window.renderStudentList = function(subjectObj) {
 
     for (let i = 1; i <= TOTAL_STUDENTS; i++) {
         const studentId = `student_${i}`;
-        const name = `Học sinh ${i}`;
+        
+        // Lấy tên từ danh sách STUDENT_NAMES (i-1 vì mảng bắt đầu từ vị trí 0)
+        const name = STUDENT_NAMES[i - 1] || `Học sinh ${i}`;
+        
         const total = calculateTotal(studentId, subjectObj.id);
         
         const row = document.createElement('div');
@@ -219,29 +236,23 @@ window.openOptionModal = function(id, name) {
     document.getElementById('modal-options').style.display = 'block';
 }
 
-// CẬP NHẬT: LOGIC MỞ MODAL NHẬP ĐIỂM MỚI
 window.checkPermissionAndShowAdd = function() {
     closeModal('modal-options');
     if (!currentUser) return;
     
     document.getElementById('modal-add').style.display = 'block';
     
-    // Set info
     document.getElementById('add-student-name').innerText = document.getElementById('opt-student-name').innerText;
     document.getElementById('add-subject-tag').innerText = currentSubject.name;
     
-    // Reset inputs
     document.getElementById('score-input').value = "";
     document.getElementById('reason-input').value = "";
     
-    // Reset state to Plus
     setScoreType('plus');
     
-    // Auto focus (đợi modal hiện hẳn)
     setTimeout(() => document.getElementById('score-input').focus(), 150);
 }
 
-// CẬP NHẬT: LOGIC CHỌN LOẠI ĐIỂM (CỘNG/TRỪ)
 window.setScoreType = function(type) {
     currentScoreType = type;
     const segControl = document.querySelector('.segmented-control');
@@ -253,25 +264,17 @@ window.setScoreType = function(type) {
     if (type === 'plus') {
         segControl.classList.remove('is-minus');
         segControl.classList.add('is-plus');
-        
         segPlus.classList.add('active');
         segMinus.classList.remove('active');
-        
         heroContainer.classList.remove('minus-mode');
-        
-        // Đổi màu nút Lưu cho sinh động
         btnSave.style.background = 'var(--success)';
         btnSave.style.boxShadow = '0 8px 20px -6px rgba(22, 163, 74, 0.4)';
     } else {
         segControl.classList.remove('is-plus');
         segControl.classList.add('is-minus');
-        
         segPlus.classList.remove('active');
         segMinus.classList.add('active');
-        
         heroContainer.classList.add('minus-mode');
-        
-        // Đổi màu nút Lưu cảnh báo
         btnSave.style.background = 'var(--danger)';
         btnSave.style.boxShadow = '0 8px 20px -6px rgba(220, 38, 38, 0.4)';
     }
@@ -304,7 +307,6 @@ window.saveScore = function() {
     });
 }
 
-// HISTORY & DELETE
 window.viewHistory = function() {
     closeModal('modal-options');
     document.getElementById('modal-history').style.display = 'block';
@@ -372,13 +374,12 @@ window.requestDelete = function(key) {
     setTimeout(() => document.getElementById('delete-reason-input').focus(), 100);
 }
 
-// CẬP NHẬT: LOGIC XÓA DÙNG TOAST THAY CHO ALERT
 window.confirmDeleteAction = function() {
     if (!pendingDeleteKey || !currentUser) return;
 
     const reason = document.getElementById('delete-reason-input').value.trim();
     if (!reason) {
-        showToast("Vui lòng nhập lý do xóa!"); // Dùng Toast thay vì Alert
+        showToast("Vui lòng nhập lý do xóa!");
         return; 
     }
 
