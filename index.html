@@ -13,7 +13,7 @@
         <div class="header-content">
             <h3 id="app-title">Quản Lý Điểm</h3>
             <button id="auth-btn" class="btn-login" onclick="handleAuthAction()">
-                <span class="icon">🔒</span> Đăng nhập
+                Đăng nhập
             </button>
         </div>
     </header>
@@ -29,7 +29,7 @@
             <div class="detail-header">
                 <button class="btn-back" onclick="showDashboard()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    Quay lại Menu
+                    Quay lại
                 </button>
                 <div class="subject-badge" id="current-subject-badge">Toán</div>
             </div>
@@ -62,7 +62,7 @@
                     <input type="password" id="password-input" placeholder="Nhập mật mã...">
                 </div>
                 <p id="login-error" class="error-text">⚠️ Mật khẩu không chính xác</p>
-                <button class="btn-primary full-width large-btn" onclick="performLogin()">Xác thực</button>
+                <button class="btn-primary full-width large-btn" onclick="performLogin()">Đăng nhập</button>
             </div>
         </div>
     </div>
@@ -74,10 +74,13 @@
                 <span class="close-btn" onclick="closeModal('modal-options')">&times;</span>
             </div>
             <div class="action-buttons">
-                <button class="btn-primary full-width" onclick="checkPermissionAndShowAdd()">
+                <button id="btn-action-add" class="btn-primary full-width" onclick="checkPermissionAndShowAdd()">
                     Nhập điểm môn <span id="opt-subject-name"></span>
                 </button>
-                <button class="btn-secondary full-width" onclick="viewHistory()">Xem lịch sử & Xóa</button>
+                
+                <button class="btn-secondary full-width" onclick="viewHistory()">
+                    Xem lịch sử
+                </button>
             </div>
         </div>
     </div>
@@ -100,13 +103,18 @@
             </div>
 
             <div class="input-grid">
-                <div class="form-group">
+                <div class="modern-input-group">
                     <label>Số điểm</label>
-                    <input type="number" id="score-input" placeholder="0.0" inputmode="decimal" step="0.1" class="big-input">
+                    <div class="input-wrapper">
+                        <input type="number" id="score-input" placeholder="0.0" inputmode="decimal" step="0.1" class="modern-input main-score">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Lý do</label>
-                    <input type="text" id="reason-input" placeholder="Nhập lý do..." class="big-input">
+                
+                <div class="modern-input-group">
+                    <label>Lý do / Nội dung</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="reason-input" placeholder="Ví dụ: Phát biểu bài..." class="modern-input">
+                    </div>
                 </div>
             </div>
 
@@ -120,7 +128,7 @@
     <div id="modal-history" class="modal">
         <div class="modal-content large-modal">
             <div class="modal-header">
-                <h2>Lịch Sử Ghi Nhận</h2>
+                <h2>Lịch Sử</h2>
                 <span class="close-btn" onclick="closeModal('modal-history')">&times;</span>
             </div>
             <div class="history-context">
@@ -133,7 +141,7 @@
                             <th>Ngày</th>
                             <th>Nội dung</th>
                             <th class="text-right">Điểm</th>
-                            <th class="text-center">#</th>
+                            <th class="text-center" id="col-action-header">#</th>
                         </tr>
                     </thead>
                     <tbody id="history-body"></tbody>
