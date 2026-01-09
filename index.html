@@ -3,41 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bảng Điểm Lớp Học</title>
+    <title>Thi Đua Lớp Học</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <header>
         <div class="header-content">
-            <h1>⭐ Quản Lý Thi Đua</h1>
-            <button id="auth-btn" class="btn-outline" onclick="toggleLoginState()">Đăng nhập Admin</button>
+            <h3>⭐ Quản Lý Thi Đua</h3>
+            <button id="auth-btn" class="btn-outline" onclick="handleAuthAction()">Đăng nhập</button>
         </div>
     </header>
 
     <main>
-        <div id="grid-container" class="grid-container">
-            </div>
+        <div class="list-header">
+            <span>Học sinh</span>
+            <span>Tổng điểm</span>
+        </div>
+        <div id="student-list" class="list-container">
+            <div class="loading">Đang tải dữ liệu...</div>
+        </div>
     </main>
 
     <div id="modal-login" class="modal">
         <div class="modal-content small-modal">
             <span class="close-btn" onclick="closeModal('modal-login')">&times;</span>
-            <h2>Đăng nhập Giáo Viên</h2>
-            <p>Nhập mật khẩu để sửa điểm.</p>
-            <input type="password" id="password-input" placeholder="Mật khẩu (Mặc định: 1234)">
-            <button class="btn-primary full-width" onclick="performLogin()">Xác nhận</button>
-            <p id="login-error" class="error-text">Mật khẩu sai!</p>
+            <h2>Xác thực Giáo Viên</h2>
+            <input type="password" id="password-input" placeholder="Nhập mật khẩu quản trị">
+            <button class="btn-primary full-width" onclick="performLogin()">Đăng nhập</button>
+            <p id="login-error" class="error-text">Mật khẩu không đúng</p>
         </div>
     </div>
 
     <div id="modal-options" class="modal">
         <div class="modal-content small-modal">
             <span class="close-btn" onclick="closeModal('modal-options')">&times;</span>
-            <h2 id="opt-student-name" class="highlight-text">Tên Học Sinh</h2>
+            <h2 id="opt-student-name" class="highlight-text"></h2>
             <div class="action-buttons">
-                <button class="btn-info full-width" onclick="viewHistory()">Xem Lịch Sử</button>
-                <button class="btn-primary full-width" onclick="checkPermissionAndShowAdd()">+ Nhập Điểm</button>
+                <button class="btn-primary full-width" onclick="checkPermissionAndShowAdd()">Nhập điểm</button>
+                <button class="btn-info full-width" onclick="viewHistory()">Xem Lịch Sử & Xóa</button>
             </div>
         </div>
     </div>
@@ -45,14 +50,16 @@
     <div id="modal-add" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-add')">&times;</span>
-            <h2>Nhập điểm: <span id="add-student-name"></span></h2>
+            <h2>Nhập điểm: <span id="add-student-name" style="color: var(--primary-color)"></span></h2>
             
+            <div class="score-type-switch">
+                <button id="btn-plus" class="type-btn active" onclick="setScoreType('plus')">Điểm Cộng (+)</button>
+                <button id="btn-minus" class="type-btn" onclick="setScoreType('minus')">Điểm Trừ (-)</button>
+            </div>
+
             <div class="form-group">
-                <label>Số điểm (+ hoặc -):</label>
-                <div class="input-wrapper">
-                    <input type="text" id="score-input" placeholder="VD: 0.5 hoặc -1" inputmode="decimal">
-                </div>
-                <small>Hỗ trợ dấu chấm (.) và dấu phẩy (,)</small>
+                <label>Số điểm:</label>
+                <input type="number" id="score-input" placeholder="Nhập số (VD: 0.5)" inputmode="decimal" step="0.1">
             </div>
 
             <div class="form-group">
@@ -62,7 +69,7 @@
 
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="closeModal('modal-add')">Hủy</button>
-                <button class="btn-primary" onclick="saveScore()">Lưu Điểm</button>
+                <button class="btn-primary" onclick="saveScore()">Lưu</button>
             </div>
         </div>
     </div>
@@ -78,6 +85,7 @@
                             <th>Thời gian</th>
                             <th>Lý do</th>
                             <th class="text-right">Điểm</th>
+                            <th class="text-center" width="50">Xóa</th>
                         </tr>
                     </thead>
                     <tbody id="history-body">
@@ -87,6 +95,6 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
