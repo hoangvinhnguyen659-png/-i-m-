@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// Cấu hình Firebase của bạn
+// --- DÁN CHÍNH XÁC MÃ CỦA BẠN VÀO ĐÂY ---
 const firebaseConfig = {
   apiKey: "AIzaSyB7eohUunH5fip0MXPDKVuPl9ZUx7dVGJc",
   authDomain: "diem-6f691.firebaseapp.com",
@@ -23,6 +23,7 @@ let currentStudentId = "";
 let currentScoreType = "plus"; 
 let classData = {}; 
 
+// Tự động tải dữ liệu khi mở trang
 document.addEventListener('DOMContentLoaded', () => {
     const dataRef = ref(db, 'students');
     onValue(dataRef, (snapshot) => {
@@ -62,9 +63,10 @@ function calculateTotal(studentId) {
 
 window.handleAuthAction = function() {
     if (isAdmin) {
-        if(confirm("Xác nhận đăng xuất?")) {
+        if(confirm("Bạn có chắc muốn đăng xuất Admin?")) {
             isAdmin = false;
             document.getElementById('auth-btn').textContent = "Đăng nhập";
+            document.getElementById('auth-btn').style.color = "var(--primary-color)";
         }
     } else {
         document.getElementById('modal-login').style.display = 'block';
@@ -72,11 +74,14 @@ window.handleAuthAction = function() {
 }
 
 window.performLogin = function() {
-    if (document.getElementById('password-input').value === ADMIN_PASS) {
+    const inputPass = document.getElementById('password-input').value;
+    if (inputPass === ADMIN_PASS) {
         isAdmin = true;
         closeModal('modal-login');
         document.getElementById('auth-btn').textContent = "Đăng xuất (Admin)";
+        document.getElementById('auth-btn').style.color = "var(--danger-color)";
         document.getElementById('password-input').value = "";
+        document.getElementById('login-error').style.display = 'none';
     } else {
         document.getElementById('login-error').style.display = 'block';
     }
@@ -95,6 +100,8 @@ window.checkPermissionAndShowAdd = function() {
     if (isAdmin) {
         document.getElementById('modal-add').style.display = 'block';
         document.getElementById('add-student-name').innerText = document.getElementById('opt-student-name').innerText;
+        document.getElementById('score-input').value = "";
+        document.getElementById('reason-input').value = "";
         setScoreType('plus');
     } else {
         alert("Vui lòng đăng nhập Admin để nhập điểm!");
@@ -110,13 +117,14 @@ window.setScoreType = function(type) {
 
 window.saveScore = function() {
     const val = document.getElementById('score-input').value;
-    if (!val) return;
+    if (!val) return alert("Vui lòng nhập số điểm!");
+    
     let score = Math.abs(parseFloat(val));
     if (currentScoreType === 'minus') score = -score;
 
     push(ref(db, `students/${currentStudentId}`), {
         score: score,
-        reason: document.getElementById('reason-input').value || "Không lý do",
+        reason: document.getElementById('reason-input').value || "Không có lý do",
         date: new Date().toLocaleString('vi-VN')
     }).then(() => closeModal('modal-add'));
 }
@@ -125,24 +133,29 @@ window.viewHistory = function() {
     closeModal('modal-options');
     document.getElementById('modal-history').style.display = 'block';
     document.getElementById('hist-student-name').innerText = document.getElementById('opt-student-name').innerText;
+    
     const tbody = document.getElementById('history-body');
     tbody.innerHTML = "";
     const studentData = classData[currentStudentId];
-    if (!studentData) return tbody.innerHTML = "<tr><td colspan='4' class='text-center'>Trống</td></tr>";
+    
+    if (!studentData) {
+        tbody.innerHTML = "<tr><td colspan='4' class='text-center'>Chưa có lịch sử điểm</td></tr>";
+        return;
+    }
 
     Object.entries(studentData).reverse().forEach(([key, item]) => {
-        const delBtn = isAdmin ? `<button class="btn-del" onclick="deleteScore('${key}')">🗑️</button>` : '';
+        const delBtn = isAdmin ? `<button class="btn-del" onclick="deleteScore('${key}')">🗑️</button>` : '---';
         tbody.innerHTML += `<tr>
             <td><small>${item.date}</small></td>
             <td>${item.reason}</td>
-            <td class="text-right" style="color:${item.score>=0?'green':'red'}"><b>${item.score>0?'+':''}${item.score}</b></td>
+            <td class="text-right" style="color:${item.score>=0?'var(--success-color)':'var(--danger-color)'}"><b>${item.score>0?'+':''}${item.score}</b></td>
             <td class="text-center">${delBtn}</td>
         </tr>`;
     });
 }
 
 window.deleteScore = function(key) {
-    if (confirm("Xác nhận xóa điểm này?")) {
+    if (confirm("Xác nhận xóa dòng điểm này?")) {
         remove(ref(db, `students/${currentStudentId}/${key}`)).then(() => viewHistory());
     }
 }
