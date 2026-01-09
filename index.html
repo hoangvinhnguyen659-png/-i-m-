@@ -150,6 +150,26 @@
         </div>
     </div>
 
+    <div id="modal-delete-confirm" class="modal">
+        <div class="modal-content small-modal">
+            <div class="modal-header">
+                <h2>Xác nhận xóa</h2>
+                <span class="close-btn" onclick="closeModal('modal-delete-confirm')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-sub); margin-bottom: 15px;">Bạn đang xóa một điểm số. Hành động này sẽ được lưu lại.</p>
+                <div class="form-group">
+                    <label>Lý do xóa <span style="color:red">*</span></label>
+                    <input type="text" id="delete-reason-input" placeholder="Ví dụ: Nhập nhầm điểm..." autocomplete="off">
+                </div>
+                <div class="action-buttons horizontal" style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn-secondary" onclick="closeModal('modal-delete-confirm')">Hủy</button>
+                    <button class="btn-danger" style="flex:1; background: var(--danger); color: white; border:none; border-radius:10px; font-weight:600;" onclick="confirmDeleteAction()">Xác nhận Xóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="toast-container"></div>
 
     <script type="module" src="script.js"></script>
