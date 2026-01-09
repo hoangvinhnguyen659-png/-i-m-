@@ -6,7 +6,7 @@
     <title>Quản Lý Điểm</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -97,42 +97,48 @@
     </div>
 
     <div id="modal-add" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Nhập Điểm</h2>
+        <div class="modal-content modal-input-styled">
+            <div class="modal-header no-border">
+                <div class="header-info">
+                    <span id="add-subject-tag" class="badge-subject">Môn Toán</span>
+                    <h2 id="add-student-name">Học sinh A</h2>
+                </div>
                 <span class="close-btn" onclick="closeModal('modal-add')">&times;</span>
             </div>
             
-            <div class="modal-body">
-                <div class="student-info-bar">
-                    <span id="add-student-name" class="st-name"></span>
-                    <span id="add-subject-tag" class="sb-tag"></span>
-                </div>
-
-                <div class="score-type-switch">
-                    <button id="btn-plus" class="type-btn active" onclick="setScoreType('plus')">
-                        <i class="ri-add-line"></i> Điểm Cộng
-                    </button>
-                    <button id="btn-minus" class="type-btn" onclick="setScoreType('minus')">
-                        <i class="ri-subtract-line"></i> Điểm Trừ
-                    </button>
-                </div>
-
-                <div class="input-grid">
-                    <div class="modern-input-group">
-                        <label>Số điểm</label>
-                        <input type="number" id="score-input" placeholder="0.0" inputmode="decimal" step="0.1" class="modern-input main-score">
+            <div class="modal-body tight-pad">
+                <div class="segmented-control">
+                    <div class="seg-bg"></div>
+                    <div class="seg-option active" id="seg-plus" onclick="setScoreType('plus')">
+                        <i class="ri-add-circle-fill"></i> Cộng điểm
                     </div>
-                    
-                    <div class="modern-input-group">
-                        <label>Lý do</label>
-                        <input type="text" id="reason-input" placeholder="Nhập lý do..." class="modern-input">
+                    <div class="seg-option" id="seg-minus" onclick="setScoreType('minus')">
+                        <i class="ri-indeterminate-circle-fill"></i> Trừ điểm
                     </div>
                 </div>
 
-                <div class="modal-footer">
-                    <button class="btn-secondary" onclick="closeModal('modal-add')">Hủy</button>
-                    <button class="btn-primary" onclick="saveScore()">Lưu</button>
+                <div class="hero-input-container" id="hero-container">
+                    <input type="number" id="score-input" placeholder="0" inputmode="decimal" step="0.1" class="hero-input">
+                    <span class="input-label">điểm</span>
+                </div>
+
+                <div class="quick-presets">
+                    <button onclick="addQuickScore(0.5)">0.5</button>
+                    <button onclick="addQuickScore(1)">1</button>
+                    <button onclick="addQuickScore(2)">2</button>
+                    <button onclick="addQuickScore(5)">5</button>
+                    <button onclick="addQuickScore(10)">10</button>
+                </div>
+
+                <div class="reason-box">
+                    <i class="ri-chat-1-line"></i>
+                    <input type="text" id="reason-input" placeholder="Nhập lý do (Tùy chọn)..." class="transparent-input">
+                </div>
+
+                <div class="modal-footer vertical-actions">
+                    <button class="btn-primary large-save" onclick="saveScore()">
+                        Xác nhận lưu
+                    </button>
                 </div>
             </div>
         </div>
