@@ -12,7 +12,7 @@
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: var(--bg-body);
     margin: 0; padding: 0; 
     color: var(--text-main);
@@ -29,186 +29,145 @@ header {
 }
 header h3 { margin: 0; font-weight: 700; color: var(--primary); font-size: 1.1rem; }
 
-/* Login Button - Đơn giản hóa */
+/* Nút đăng nhập/xuất gọn hơn */
 .btn-login {
-    background: var(--surface); 
+    background: transparent;
     color: var(--primary);
-    border: 1px solid var(--primary); /* Viền thay vì nền màu */
-    padding: 6px 16px; border-radius: 6px;
-    font-weight: 600; font-size: 0.85rem; cursor: pointer;
+    border: 1px solid transparent;
+    padding: 6px 12px; border-radius: 6px;
+    font-weight: 600; font-size: 0.9rem; cursor: pointer;
     transition: all 0.2s;
 }
 .btn-login:hover { background: var(--primary-light); }
-
-.btn-login.logout-mode { 
-    background: #ffebe6; color: var(--danger); border-color: #ffebe6;
-}
-.btn-login.logout-mode:hover { background: #ffbdad; border-color: #ffbdad; }
+.btn-login.logout-mode { color: var(--danger); }
+.btn-login.logout-mode:hover { background: #ffebe6; }
 
 /* MAIN LAYOUT */
 main { max-width: 500px; margin: 0 auto; padding: 20px 16px; }
+.section-title { font-size: 0.8rem; text-transform: uppercase; color: var(--text-sub); margin-bottom: 12px; font-weight: 600; }
 
-.section-title {
-    font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;
-    color: var(--text-sub); margin-bottom: 12px; font-weight: 600;
-}
-
-/* SUBJECT GRID - Bỏ bớt style thừa */
-.subject-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
-}
+/* SUBJECT GRID - Thêm lại hiệu ứng icon */
+.subject-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .subject-card {
-    background: var(--surface); padding: 20px 16px;
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    cursor: pointer; text-align: center;
-    transition: all 0.2s; position: relative;
-    border: 1px solid transparent;
+    background: var(--surface); padding: 16px;
+    border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    cursor: pointer; text-align: center; position: relative;
+    border: 1px solid transparent; transition: all 0.2s;
 }
 .subject-card:active { transform: scale(0.98); }
 .subject-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
-
-/* Icon môn học nhỏ gọn hơn */
-.sbj-icon { font-size: 24px; margin-bottom: 8px; display: block; } 
+.sbj-icon { font-size: 28px; display: block; margin-bottom: 8px; }
 .sbj-name { font-weight: 600; font-size: 0.95rem; display: block; color: var(--text-main); }
 
-/* DETAIL VIEW */
-.detail-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 16px;
-}
+/* DETAIL & LIST */
+.detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .btn-back {
-    background: var(--surface); color: var(--text-main);
-    border: 1px solid var(--border); padding: 8px 14px;
-    border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+    background: var(--surface); color: var(--text-main); border: 1px solid var(--border);
+    padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 0.9rem;
     cursor: pointer; display: flex; align-items: center; gap: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
-.subject-badge {
-    background: var(--primary-light); color: var(--primary);
-    padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9rem;
-}
+.subject-badge { background: var(--primary-light); color: var(--primary); padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9rem; }
 
-/* STUDENT LIST */
 .list-container { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; }
 .student-row {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 14px 16px; border-bottom: 1px solid var(--border);
-    cursor: pointer;
+    padding: 14px 16px; border-bottom: 1px solid var(--border); cursor: pointer;
 }
 .student-row:last-child { border-bottom: none; }
 .student-row:active { background: #f4f5f7; }
 .s-name { font-weight: 500; font-size: 0.95rem; }
-.s-score { font-weight: 700; font-size: 1rem; width: 40px; text-align: right; }
+.s-score { font-weight: 700; font-size: 1rem; }
 .pos { color: var(--success); } .neg { color: var(--danger); } .neu { color: #ccc; }
 
-/* MODALS */
+/* MODALS CHUNG */
 .modal {
     display: none; position: fixed; z-index: 1000;
     left: 0; top: 0; width: 100%; height: 100%;
-    background-color: rgba(9, 30, 66, 0.54); backdrop-filter: blur(2px);
+    background-color: rgba(9, 30, 66, 0.6); backdrop-filter: blur(2px);
 }
 .modal-content {
-    background: var(--surface); margin: 10vh auto;
-    border-radius: 16px; width: 90%; max-width: 420px;
-    animation: slideUp 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    background: var(--surface); margin: 15vh auto;
+    border-radius: 16px; width: 90%; max-width: 400px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    animation: zoomIn 0.2s ease-out;
 }
-@keyframes slideUp { from {transform: translateY(20px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+@keyframes zoomIn { from {transform: scale(0.95); opacity: 0;} to {transform: scale(1); opacity: 1;} }
 
 .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-.modal-header h2 { margin: 0; font-size: 1.1rem; color: var(--text-main); }
+.modal-header h2 { margin: 0; font-size: 1.1rem; }
 .close-btn { font-size: 24px; color: var(--text-sub); cursor: pointer; padding: 4px; }
+.modal-body { padding: 20px; }
 
-.modal-body, .form-group { padding: 0 20px; margin-top: 16px; }
-.center-header { justify-content: center; position: relative; }
-.center-header .close-btn { position: absolute; right: 16px; }
+/* STYLE MENU ACTION SHEET (MENU HỌC SINH MỚI) */
+.bottom-sheet-styled {
+    position: absolute; bottom: 0; margin: 0; width: 100%; max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
 
-/* INPUTS CHUNG */
+.sheet-header { padding: 20px; text-align: center; border-bottom: 1px solid var(--border); }
+.sheet-header h3 { margin: 0; font-size: 1.2rem; }
+.sheet-subtitle { margin: 4px 0 0; color: var(--text-sub); font-size: 0.9rem; }
+
+.sheet-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.sheet-btn {
+    width: 100%; padding: 14px; border: none; border-radius: 12px;
+    font-size: 1rem; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: transform 0.1s;
+}
+.sheet-btn:active { transform: scale(0.98); }
+.sheet-btn.primary { background: var(--primary); color: white; }
+.sheet-btn.secondary { background: #f4f5f7; color: var(--text-main); }
+.sheet-btn.cancel { background: white; color: var(--danger); border: 1px solid #f4f5f7; margin-top: 8px; }
+
+/* MODAL LOGOUT CONFIRM */
+.text-center { text-align: center; }
+.action-buttons.horizontal { display: flex; gap: 12px; justify-content: center; margin-top: 10px; }
+.btn-danger { background: var(--danger); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; flex: 1; }
+
+/* INPUT STYLES */
+.form-group { margin-bottom: 16px; }
 label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; }
 input, select {
     width: 100%; padding: 12px; border: 2px solid var(--border);
-    border-radius: 8px; font-size: 1rem; box-sizing: border-box; outline: none;
-    font-family: inherit; transition: border-color 0.2s; background: #fafbfc;
+    border-radius: 8px; font-size: 1rem; outline: none; background: #fafbfc;
 }
 input:focus, select:focus { border-color: var(--primary); background: #fff; }
 
-/* --- STYLE MỚI CHO INPUT NHẬP ĐIỂM (LÀM ĐẸP) --- */
-.input-grid { 
-    padding: 0 20px; margin-top: 20px; 
-    display: flex; flex-direction: column; gap: 15px;
-}
-.modern-input-group label {
-    margin-bottom: 8px;
-    color: var(--text-main);
-}
-.input-wrapper {
-    position: relative;
-}
-.modern-input {
-    border: 1px solid #dcdfe4;
-    background: #f8f9fa;
-    border-radius: 10px;
-    padding: 14px;
-    font-size: 1rem;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
-}
-.modern-input:focus {
-    background: #fff;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.15);
-}
-.main-score {
-    font-size: 1.5rem; /* Số to rõ ràng */
-    font-weight: 700;
-    color: var(--primary);
-    text-align: center;
-}
-/* ----------------------------------------------- */
+.modern-input-group { margin-bottom: 16px; }
+.modern-input { background: #f0f2f5; border: none; font-size: 1.1rem; padding: 16px; border-radius: 12px; }
+.modern-input:focus { background: #fff; box-shadow: 0 0 0 2px var(--primary); }
+.main-score { font-size: 1.8rem; font-weight: 700; color: var(--primary); text-align: center; letter-spacing: 1px; }
 
-.student-info-bar { 
-    background: #f4f5f7; padding: 12px 20px; 
-    display: flex; justify-content: space-between; align-items: center; 
-    border-bottom: 1px solid var(--border);
-}
-.st-name { font-weight: 700; color: var(--text-main); }
-.sb-tag { font-size: 0.75rem; background: var(--text-main); color: white; padding: 2px 8px; border-radius: 4px; }
-
-.score-type-switch { display: flex; gap: 8px; padding: 16px 20px 0; }
-.type-btn {
-    flex: 1; padding: 12px; border: 1px solid var(--border);
-    background: white; border-radius: 8px; font-weight: 600; color: var(--text-sub);
-    cursor: pointer; transition: all 0.2s;
-}
-.type-btn.active { border: none; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transform: translateY(-1px); }
-#btn-plus.active { background: var(--success); }
+/* SCORE SWITCH */
+.score-type-switch { display: flex; gap: 8px; margin: 16px 0; }
+.type-btn { flex: 1; padding: 12px; border: 1px solid var(--border); background: white; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.type-btn.active { border: none; color: white; }
+#btn-plus.active { background: var(--success); } 
 #btn-minus.active { background: var(--danger); }
 
-.modal-footer { padding: 20px; display: flex; justify-content: flex-end; gap: 10px; }
-.btn-primary { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-.btn-secondary { background: var(--bg-body); color: var(--text-main); border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-.full-width { width: 100%; margin-bottom: 10px; }
-.large-btn { padding: 14px; font-size: 1rem; margin-top: 10px; }
-
-.error-text { color: var(--danger); font-size: 0.9rem; margin-top: 8px; display: none; text-align: center; }
-
-/* TOAST */
-#toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 350px; }
+/* TOAST (Đã bỏ icon) */
+#toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 3000; width: auto; min-width: 200px; text-align: center; }
 .toast {
-    background: #172b4d; color: white; padding: 12px 16px; border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 0.9rem; display: flex; align-items: center; gap: 10px;
+    background: rgba(23, 43, 77, 0.9); backdrop-filter: blur(4px);
+    color: white; padding: 10px 20px; border-radius: 20px;
+    font-size: 0.9rem; margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     animation: fadeIn 0.3s ease-out;
 }
-.toast.error { background: #de350b; }
-.toast.success { background: #00875a; }
+.toast.error { background: rgba(222, 53, 11, 0.9); }
+.toast.success { background: rgba(0, 135, 90, 0.9); }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* TABLE HISTORY */
-.table-wrapper { max-height: 300px; overflow-y: auto; }
+.table-wrapper { max-height: 50vh; overflow-y: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-th { text-align: left; padding: 10px 15px; background: #fafbfc; color: var(--text-sub); position: sticky; top: 0; }
-td { padding: 10px 15px; border-bottom: 1px solid var(--border); }
+th { text-align: left; padding: 10px 12px; background: #fafbfc; color: var(--text-sub); position: sticky; top: 0; z-index: 1; }
+td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 .text-right { text-align: right; }
 .text-center { text-align: center; }
-.btn-del { color: var(--danger); background: none; border: none; font-weight: 600; cursor: pointer; font-size: 0.8rem; }
-.history-context { padding: 0 20px 10px; font-size: 0.85rem; color: var(--text-sub); border-bottom: 1px solid var(--border); }
+.user-tag { display: block; font-size: 0.7rem; color: var(--text-sub); margin-top: 2px; font-weight: 500; }
+.btn-del { color: var(--danger); background: none; border: 1px solid #ffebe6; padding: 4px 8px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 0.75rem; }
+.error-text { color: var(--danger); text-align: center; display: none; margin-top: 10px; }
