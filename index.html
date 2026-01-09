@@ -5,34 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Quản Lý Điểm Cộng</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <header>
         <div class="header-content">
-            <div id="header-title-area">
-                <h3 id="app-title">Quản Lý Điểm Cộng</h3>
-            </div>
-            <button id="auth-btn" class="btn-text" onclick="handleAuthAction()">Đăng nhập</button>
+            <h3 id="app-title">Quản Lý Điểm</h3>
+            <button id="auth-btn" class="btn-login" onclick="handleAuthAction()">
+                <span class="icon">🔒</span> Đăng nhập
+            </button>
         </div>
     </header>
 
     <main>
         <div id="dashboard-view">
-            <p class="section-title">Chọn môn học</p>
+            <p class="section-title">Danh mục môn học</p>
             <div class="subject-grid" id="subject-grid">
                 </div>
         </div>
 
         <div id="detail-view" style="display: none;">
-            <button class="btn-back" onclick="showDashboard()">
-                &#8592; Quay lại menu
-            </button>
-            
-            <div class="subject-header-banner">
-                <h1 id="current-subject-title">Toán Học</h1>
-                <span class="badge">Tổng kết điểm</span>
+            <div class="detail-header">
+                <button class="btn-back" onclick="showDashboard()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    Quay lại Menu
+                </button>
+                <div class="subject-badge" id="current-subject-badge">Toán</div>
             </div>
 
             <div class="list-container" id="student-list">
@@ -42,15 +41,28 @@
     </main>
 
     <div id="modal-login" class="modal">
-        <div class="modal-content small-modal">
-            <div class="modal-header">
-                <h2>Admin</h2>
+        <div class="modal-content small-modal login-modal">
+            <div class="modal-header center-header">
+                <h2>Đăng Nhập</h2>
                 <span class="close-btn" onclick="closeModal('modal-login')">&times;</span>
             </div>
             <div class="modal-body">
-                <input type="password" id="password-input" placeholder="Mật khẩu...">
-                <p id="login-error" class="error-text">Sai mật khẩu</p>
-                <button class="btn-primary full-width" onclick="performLogin()">Đăng nhập</button>
+                <div class="form-group">
+                    <label>Tài khoản</label>
+                    <select id="login-user-select">
+                        <option value="admin">Quản trị viên (Admin)</option>
+                        <option value="to1">Tổ 1</option>
+                        <option value="to2">Tổ 2</option>
+                        <option value="to3">Tổ 3</option>
+                        <option value="to4">Tổ 4</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" id="password-input" placeholder="Nhập mật mã...">
+                </div>
+                <p id="login-error" class="error-text">⚠️ Mật khẩu không chính xác</p>
+                <button class="btn-primary full-width large-btn" onclick="performLogin()">Xác thực</button>
             </div>
         </div>
     </div>
@@ -65,7 +77,7 @@
                 <button class="btn-primary full-width" onclick="checkPermissionAndShowAdd()">
                     Nhập điểm môn <span id="opt-subject-name"></span>
                 </button>
-                <button class="btn-secondary full-width" onclick="viewHistory()">Xem lịch sử</button>
+                <button class="btn-secondary full-width" onclick="viewHistory()">Xem lịch sử & Xóa</button>
             </div>
         </div>
     </div>
@@ -73,33 +85,34 @@
     <div id="modal-add" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Nhập điểm</h2>
+                <h2>Nhập Điểm</h2>
                 <span class="close-btn" onclick="closeModal('modal-add')">&times;</span>
             </div>
             
-            <div class="info-row">
-                <span>Học sinh: <b id="add-student-name"></b></span>
-                <span class="tag-subject" id="add-subject-tag">Toán</span>
+            <div class="student-info-bar">
+                <span id="add-student-name" class="st-name"></span>
+                <span id="add-subject-tag" class="sb-tag">Toán</span>
             </div>
 
             <div class="score-type-switch">
-                <button id="btn-plus" class="type-btn active" onclick="setScoreType('plus')">Cộng (+)</button>
-                <button id="btn-minus" class="type-btn" onclick="setScoreType('minus')">Trừ (-)</button>
+                <button id="btn-plus" class="type-btn active" onclick="setScoreType('plus')">Điểm Cộng (+)</button>
+                <button id="btn-minus" class="type-btn" onclick="setScoreType('minus')">Điểm Trừ (-)</button>
             </div>
 
-            <div class="form-group">
-                <label>Số điểm</label>
-                <input type="number" id="score-input" placeholder="VD: 1.0" inputmode="decimal" step="0.1">
-            </div>
-
-            <div class="form-group">
-                <label>Lý do</label>
-                <input type="text" id="reason-input" placeholder="VD: Phát biểu tốt...">
+            <div class="input-grid">
+                <div class="form-group">
+                    <label>Số điểm</label>
+                    <input type="number" id="score-input" placeholder="0.0" inputmode="decimal" step="0.1" class="big-input">
+                </div>
+                <div class="form-group">
+                    <label>Lý do</label>
+                    <input type="text" id="reason-input" placeholder="Nhập lý do..." class="big-input">
+                </div>
             </div>
 
             <div class="modal-footer">
-                <button class="btn-text" onclick="closeModal('modal-add')">Hủy</button>
-                <button class="btn-primary" onclick="saveScore()">Lưu điểm</button>
+                <button class="btn-secondary" onclick="closeModal('modal-add')">Hủy</button>
+                <button class="btn-primary" onclick="saveScore()">Lưu Kết Quả</button>
             </div>
         </div>
     </div>
@@ -107,17 +120,18 @@
     <div id="modal-history" class="modal">
         <div class="modal-content large-modal">
             <div class="modal-header">
-                <h2>Lịch sử</h2>
+                <h2>Lịch Sử Ghi Nhận</h2>
                 <span class="close-btn" onclick="closeModal('modal-history')">&times;</span>
             </div>
-            <p class="sub-header">Môn: <b id="hist-subject-name"></b> - <span id="hist-student-name"></span></p>
-            
+            <div class="history-context">
+                <span id="hist-subject-name"></span> - <span id="hist-student-name"></span>
+            </div>
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
                             <th>Ngày</th>
-                            <th>Lý do</th>
+                            <th>Nội dung</th>
                             <th class="text-right">Điểm</th>
                             <th class="text-center">#</th>
                         </tr>
@@ -127,6 +141,8 @@
             </div>
         </div>
     </div>
+
+    <div id="toast-container"></div>
 
     <script type="module" src="script.js"></script>
 </body>
