@@ -1,5 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+// Lưu ý: Dùng `update` thay vì `remove` để soft-delete
 
 const firebaseConfig = {
   apiKey: "AIzaSyB7eohUunH5fip0MXPDKVuPl9ZUx7dVGJc",
@@ -14,7 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Danh sách tài khoản hợp lệ
+// Danh sách tài khoản
 const ACCOUNTS = {
     'admin': { pass: '1528', name: 'Quản trị viên' },
     'to1': { pass: '5828', name: 'Tổ 1' },
@@ -23,7 +25,6 @@ const ACCOUNTS = {
     'to4': { pass: '1928', name: 'Tổ 4' }
 };
 
-// Cập nhật Icon đẹp hơn (Dùng class của RemixIcon)
 const SUBJECTS = [
     { id: 'Toán', name: 'Toán Học', icon: 'ri-function-line' },
     { id: 'Lí', name: 'Vật Lí', icon: 'ri-flashlight-line' },
@@ -43,6 +44,7 @@ let classData = {};
 let currentStudentId = "";
 let currentScoreType = "plus"; 
 let currentSubject = null; 
+let pendingDeleteKey = null; // Biến tạm lưu key đang chờ xóa
 
 document.addEventListener('DOMContentLoaded', () => {
     renderDashboard();
@@ -50,8 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const dataRef = ref(db, 'students');
     onValue(dataRef, (snapshot) => {
         classData = snapshot.val() || {};
+        // Realtime update: Nếu đang ở màn hình list, render lại
         if (currentSubject && document.getElementById('detail-view').style.display !== 'none') {
             renderStudentList(currentSubject);
+        }
+        // Realtime update: Nếu đang mở lịch sử, render lại luôn
+        if(document.getElementById('modal-history').style.display === 'block') {
+            viewHistory();
         }
     });
 });
@@ -68,16 +75,15 @@ function showToast(message) {
     }, 2500);
 }
 
-// --- AUTH LOGIC MỚI ---
+// --- AUTH ---
 window.handleAuthAction = function() {
     if (currentUser) {
         document.getElementById('modal-logout-confirm').style.display = 'block';
     } else {
-        document.getElementById('login-username').value = ""; // Reset input
+        document.getElementById('login-username').value = ""; 
         document.getElementById('password-input').value = "";
         document.getElementById('login-error').style.display = 'none';
         document.getElementById('modal-login').style.display = 'block';
-        // Focus vào ô nhập user
         setTimeout(() => document.getElementById('login-username').focus(), 100);
     }
 }
@@ -90,9 +96,8 @@ window.confirmLogout = function() {
     showDashboard();
 }
 
-// Logic đăng nhập nhập tay
 window.performLogin = function() {
-    const usernameInput = document.getElementById('login-username').value.trim().toLowerCase(); // Tự động viết thường
+    const usernameInput = document.getElementById('login-username').value.trim().toLowerCase();
     const passwordInput = document.getElementById('password-input').value;
 
     const account = ACCOUNTS[usernameInput];
@@ -123,13 +128,10 @@ function updateAuthButton() {
 window.renderDashboard = function() {
     const grid = document.getElementById('subject-grid');
     grid.innerHTML = "";
-    
     SUBJECTS.forEach(sub => {
         const card = document.createElement('div');
         card.className = 'subject-card';
         card.onclick = () => openSubject(sub);
-        
-        // Dùng thẻ <i> cho icon RemixIcon
         card.innerHTML = `
             <i class="subject-icon-box ${sub.icon}"></i>
             <span class="sbj-name">${sub.name}</span>
@@ -143,12 +145,10 @@ window.openSubject = function(subjectObj) {
         showToast("Mục này chỉ dành cho ADMIN");
         return;
     }
-
     currentSubject = subjectObj;
     document.getElementById('dashboard-view').style.display = 'none';
     document.getElementById('detail-view').style.display = 'block';
     document.getElementById('current-subject-badge').innerText = subjectObj.name;
-    
     renderStudentList(subjectObj);
 }
 
@@ -190,7 +190,10 @@ window.renderStudentList = function(subjectObj) {
 function calculateTotal(studentId, subjectId) {
     if (!classData[studentId]) return 0;
     const records = Object.values(classData[studentId]);
-    const filtered = records.filter(item => (item.subject || 'Khác') === subjectId);
+    // Sửa: Lọc bỏ các mục có deleted = true
+    const filtered = records.filter(item => 
+        (item.subject || 'Khác') === subjectId && !item.deleted
+    );
     const total = filtered.reduce((sum, item) => sum + item.score, 0);
     return Math.round(total * 10) / 10;
 }
@@ -209,7 +212,6 @@ window.openOptionModal = function(id, name) {
     } else {
         btnAdd.style.display = 'none';
     }
-
     document.getElementById('modal-options').style.display = 'block';
 }
 
@@ -252,13 +254,15 @@ window.saveScore = function() {
         subject: currentSubject.id, 
         reason: reason || "Không có lý do",
         date: new Date().toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit'}),
-        user: currentUser 
+        user: currentUser,
+        deleted: false // Mặc định chưa xóa
     }).then(() => {
         closeModal('modal-add');
         showToast("Đã lưu điểm");
     });
 }
 
+// --- LỊCH SỬ & XÓA (LOGIC MỚI) ---
 window.viewHistory = function() {
     closeModal('modal-options');
     document.getElementById('modal-history').style.display = 'block';
@@ -272,6 +276,7 @@ window.viewHistory = function() {
     }
 
     const records = Object.entries(classData[currentStudentId]).reverse();
+    // Lấy hết các bản ghi của môn học này, kể cả đã xóa
     const filteredRecords = records.filter(([key, item]) => (item.subject || 'Khác') === currentSubject.id);
 
     if (filteredRecords.length === 0) {
@@ -280,15 +285,29 @@ window.viewHistory = function() {
     }
 
     filteredRecords.forEach(([key, item]) => {
+        const isDeleted = item.deleted === true;
         const color = item.score >= 0 ? 'var(--success)' : 'var(--danger)';
         const accName = ACCOUNTS[item.user] ? ACCOUNTS[item.user].name : 'Ẩn danh';
         
+        let rowContent = '';
+        let rowClass = isDeleted ? 'row-deleted' : '';
+        let scoreStyle = isDeleted ? '' : `color:${color}; font-weight:bold`;
+
+        // Logic hiển thị nút xóa
         let deleteBtn = '';
-        if (currentUser) {
-            deleteBtn = ` <button class="btn-del-text" onclick="deleteScore('${key}')">Xóa</button>`;
+        if (currentUser && !isDeleted) {
+            deleteBtn = ` <button class="btn-del-text" onclick="requestDelete('${key}')">Xóa</button>`;
+        }
+
+        // Nếu đã xóa, hiển thị thông tin người xóa
+        let deletedInfo = '';
+        if (isDeleted) {
+            const delUser = ACCOUNTS[item.deletedBy] ? ACCOUNTS[item.deletedBy].name : 'Ẩn danh';
+            deletedInfo = `<span class="deleted-info">Đã xóa bởi ${delUser}: ${item.deleteReason}</span>`;
         }
         
         const tr = document.createElement('tr');
+        tr.className = rowClass;
         tr.innerHTML = `
             <td>
                 <span class="date-tag">${item.date}</span>
@@ -297,8 +316,9 @@ window.viewHistory = function() {
             <td>
                 ${item.reason}
                 ${deleteBtn}
+                ${deletedInfo}
             </td>
-            <td class="text-right" style="color:${color}; font-weight:bold">
+            <td class="text-right s-score-cell" style="${scoreStyle}">
                 ${item.score > 0 ? '+' : ''}${item.score}
             </td>
         `;
@@ -306,14 +326,37 @@ window.viewHistory = function() {
     });
 }
 
-window.deleteScore = function(key) {
+// Bước 1: Yêu cầu xóa - Mở Modal nhập lý do
+window.requestDelete = function(key) {
     if (!currentUser) return;
-    if (confirm("Xóa điểm này?")) {
-        remove(ref(db, `students/${currentStudentId}/${key}`)).then(() => {
-            viewHistory(); 
-            showToast("Đã xóa");
-        });
+    pendingDeleteKey = key; // Lưu key cần xóa vào biến tạm
+    document.getElementById('delete-reason-input').value = ""; // Reset input
+    document.getElementById('modal-delete-confirm').style.display = 'block';
+    setTimeout(() => document.getElementById('delete-reason-input').focus(), 100);
+}
+
+// Bước 2: Xác nhận xóa sau khi nhập lý do
+window.confirmDeleteAction = function() {
+    if (!pendingDeleteKey || !currentUser) return;
+
+    const reason = document.getElementById('delete-reason-input').value.trim();
+    if (!reason) {
+        alert("Vui lòng nhập lý do xóa (ví dụ: Nhập nhầm điểm)");
+        return; // Không cho phép xóa nếu không có lý do
     }
+
+    // Thực hiện Soft Delete: Update trường deleted = true
+    update(ref(db, `students/${currentStudentId}/${pendingDeleteKey}`), {
+        deleted: true,
+        deletedBy: currentUser,
+        deleteReason: reason,
+        deletedAt: new Date().toISOString()
+    }).then(() => {
+        closeModal('modal-delete-confirm');
+        pendingDeleteKey = null;
+        showToast("Đã xóa điểm thành công");
+        // viewHistory tự động cập nhật nhờ onValue
+    });
 }
 
 window.onclick = (e) => { 
