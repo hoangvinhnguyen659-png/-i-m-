@@ -1,5 +1,5 @@
 :root {
-    --primary: #0052cc; /* Xanh đậm kiểu Enterprise */
+    --primary: #0052cc;
     --primary-light: #deebff;
     --bg-body: #f4f5f7;
     --surface: #ffffff;
@@ -29,17 +29,21 @@ header {
 }
 header h3 { margin: 0; font-weight: 700; color: var(--primary); font-size: 1.1rem; }
 
-/* Login Button styled nicely */
+/* Login Button - Đơn giản hóa */
 .btn-login {
-    background: var(--primary); color: white;
-    border: none; padding: 8px 16px; border-radius: 20px;
+    background: var(--surface); 
+    color: var(--primary);
+    border: 1px solid var(--primary); /* Viền thay vì nền màu */
+    padding: 6px 16px; border-radius: 6px;
     font-weight: 600; font-size: 0.85rem; cursor: pointer;
-    display: flex; align-items: center; gap: 6px;
     transition: all 0.2s;
 }
-.btn-login:hover { background: #0043a8; transform: translateY(-1px); }
-.btn-login.logout-mode { background: #ffebe6; color: var(--danger); }
-.btn-login.logout-mode:hover { background: #ffbdad; }
+.btn-login:hover { background: var(--primary-light); }
+
+.btn-login.logout-mode { 
+    background: #ffebe6; color: var(--danger); border-color: #ffebe6;
+}
+.btn-login.logout-mode:hover { background: #ffbdad; border-color: #ffbdad; }
 
 /* MAIN LAYOUT */
 main { max-width: 500px; margin: 0 auto; padding: 20px 16px; }
@@ -49,28 +53,24 @@ main { max-width: 500px; margin: 0 auto; padding: 20px 16px; }
     color: var(--text-sub); margin-bottom: 12px; font-weight: 600;
 }
 
-/* SUBJECT GRID */
+/* SUBJECT GRID - Bỏ bớt style thừa */
 .subject-grid {
     display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
 }
 .subject-card {
-    background: var(--surface); padding: 16px;
-    border-radius: 12px; border: 1px solid transparent;
+    background: var(--surface); padding: 20px 16px;
+    border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     cursor: pointer; text-align: center;
     transition: all 0.2s; position: relative;
-    overflow: hidden;
+    border: 1px solid transparent;
 }
 .subject-card:active { transform: scale(0.98); }
 .subject-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
-.subject-card.locked { opacity: 0.7; background: #f9f9f9; }
-.subject-card.locked::after {
-    content: "🔒 Admin"; position: absolute; top: 8px; right: 8px;
-    font-size: 0.6rem; background: #dfe1e6; padding: 2px 6px; border-radius: 4px;
-}
 
-.sbj-icon { font-size: 28px; margin-bottom: 8px; display: block; }
-.sbj-name { font-weight: 600; font-size: 0.95rem; display: block; }
+/* Icon môn học nhỏ gọn hơn */
+.sbj-icon { font-size: 24px; margin-bottom: 8px; display: block; } 
+.sbj-name { font-weight: 600; font-size: 0.95rem; display: block; color: var(--text-main); }
 
 /* DETAIL VIEW */
 .detail-header {
@@ -84,8 +84,6 @@ main { max-width: 500px; margin: 0 auto; padding: 20px 16px; }
     cursor: pointer; display: flex; align-items: center; gap: 6px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
-.btn-back:hover { background: #f4f5f7; }
-
 .subject-badge {
     background: var(--primary-light); color: var(--primary);
     padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9rem;
@@ -126,7 +124,7 @@ main { max-width: 500px; margin: 0 auto; padding: 20px 16px; }
 .center-header { justify-content: center; position: relative; }
 .center-header .close-btn { position: absolute; right: 16px; }
 
-/* INPUTS */
+/* INPUTS CHUNG */
 label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; }
 input, select {
     width: 100%; padding: 12px; border: 2px solid var(--border);
@@ -134,6 +132,39 @@ input, select {
     font-family: inherit; transition: border-color 0.2s; background: #fafbfc;
 }
 input:focus, select:focus { border-color: var(--primary); background: #fff; }
+
+/* --- STYLE MỚI CHO INPUT NHẬP ĐIỂM (LÀM ĐẸP) --- */
+.input-grid { 
+    padding: 0 20px; margin-top: 20px; 
+    display: flex; flex-direction: column; gap: 15px;
+}
+.modern-input-group label {
+    margin-bottom: 8px;
+    color: var(--text-main);
+}
+.input-wrapper {
+    position: relative;
+}
+.modern-input {
+    border: 1px solid #dcdfe4;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 1rem;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+}
+.modern-input:focus {
+    background: #fff;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.15);
+}
+.main-score {
+    font-size: 1.5rem; /* Số to rõ ràng */
+    font-weight: 700;
+    color: var(--primary);
+    text-align: center;
+}
+/* ----------------------------------------------- */
 
 .student-info-bar { 
     background: #f4f5f7; padding: 12px 20px; 
@@ -145,16 +176,13 @@ input:focus, select:focus { border-color: var(--primary); background: #fff; }
 
 .score-type-switch { display: flex; gap: 8px; padding: 16px 20px 0; }
 .type-btn {
-    flex: 1; padding: 10px; border: 1px solid var(--border);
+    flex: 1; padding: 12px; border: 1px solid var(--border);
     background: white; border-radius: 8px; font-weight: 600; color: var(--text-sub);
-    cursor: pointer;
+    cursor: pointer; transition: all 0.2s;
 }
-.type-btn.active { border: none; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.type-btn.active { border: none; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transform: translateY(-1px); }
 #btn-plus.active { background: var(--success); }
 #btn-minus.active { background: var(--danger); }
-
-.input-grid { padding: 0 20px; margin-top: 16px; display: flex; flex-direction: column; gap: 12px;}
-.big-input { font-size: 1.1rem; padding: 14px; }
 
 .modal-footer { padding: 20px; display: flex; justify-content: flex-end; gap: 10px; }
 .btn-primary { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
@@ -164,7 +192,7 @@ input:focus, select:focus { border-color: var(--primary); background: #fff; }
 
 .error-text { color: var(--danger); font-size: 0.9rem; margin-top: 8px; display: none; text-align: center; }
 
-/* TOAST NOTIFICATION */
+/* TOAST */
 #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 350px; }
 .toast {
     background: #172b4d; color: white; padding: 12px 16px; border-radius: 8px;
