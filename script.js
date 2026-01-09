@@ -1,12 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// --- LƯU Ý BẢO MẬT ---
-// Vì đây là ứng dụng client-side (không có server backend), API Key bắt buộc phải công khai.
-// Để bảo mật, bạn MỚI vào Google Cloud Console > APIs & Services > Credentials.
-// Tại mục "Application restrictions", chọn "HTTP referrers (web sites)" 
-// và thêm tên miền của bạn vào (ví dụ: https://hoangvinhnguyen659-png.github.io/*)
-// Điều này ngăn chặn người khác lấy trộm Key dùng cho web khác.
 const firebaseConfig = {
   apiKey: "AIzaSyB7eohUunH5fip0MXPDKVuPl9ZUx7dVGJc",
   authDomain: "diem-6f691.firebaseapp.com",
@@ -20,33 +14,27 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// Danh sách tài khoản hợp lệ
 const ACCOUNTS = {
-    'admin': '1528',
-    'to1': '5828',
-    'to2': '2028',
-    'to3': '9028',
-    'to4': '1928'
+    'admin': { pass: '1528', name: 'Quản trị viên' },
+    'to1': { pass: '5828', name: 'Tổ 1' },
+    'to2': { pass: '2028', name: 'Tổ 2' },
+    'to3': { pass: '9028', name: 'Tổ 3' },
+    'to4': { pass: '1928', name: 'Tổ 4' }
 };
 
-const ACCOUNT_NAMES = {
-    'admin': 'Quản trị viên',
-    'to1': 'Tổ 1',
-    'to2': 'Tổ 2',
-    'to3': 'Tổ 3',
-    'to4': 'Tổ 4'
-};
-
+// Cập nhật Icon đẹp hơn (Dùng class của RemixIcon)
 const SUBJECTS = [
-    { id: 'Toán', name: 'Toán Học', icon: '📐' },
-    { id: 'Lí', name: 'Vật Lí', icon: '⚡' },
-    { id: 'Hóa', name: 'Hóa Học', icon: '🧪' },
-    { id: 'Sinh', name: 'Sinh Học', icon: '🧬' },
-    { id: 'Tin', name: 'Tin Học', icon: '💻' },
-    { id: 'Văn', name: 'Ngữ Văn', icon: '📚' },
-    { id: 'Sử', name: 'Lịch Sử', icon: '🏰' },
-    { id: 'Anh', name: 'Tiếng Anh', icon: '🌏' },
-    { id: 'GDQP', name: 'GDQP', icon: '🛡️' },
-    { id: 'Khác', name: 'Hoạt động khác', icon: '⭐', adminOnly: true }
+    { id: 'Toán', name: 'Toán Học', icon: 'ri-function-line' },
+    { id: 'Lí', name: 'Vật Lí', icon: 'ri-flashlight-line' },
+    { id: 'Hóa', name: 'Hóa Học', icon: 'ri-test-tube-line' },
+    { id: 'Sinh', name: 'Sinh Học', icon: 'ri-plant-line' },
+    { id: 'Tin', name: 'Tin Học', icon: 'ri-computer-line' },
+    { id: 'Văn', name: 'Ngữ Văn', icon: 'ri-book-open-line' },
+    { id: 'Sử', name: 'Lịch Sử', icon: 'ri-ancient-gate-line' },
+    { id: 'Anh', name: 'Tiếng Anh', icon: 'ri-global-line' },
+    { id: 'GDQP', name: 'GDQP', icon: 'ri-shield-star-line' },
+    { id: 'Khác', name: 'Hoạt động khác', icon: 'ri-star-smile-line', adminOnly: true }
 ];
 
 const TOTAL_STUDENTS = 42;
@@ -60,23 +48,19 @@ document.addEventListener('DOMContentLoaded', () => {
     renderDashboard();
     
     const dataRef = ref(db, 'students');
-    // Dùng onValue nhưng xử lý nhẹ nhàng hơn để đỡ lag
     onValue(dataRef, (snapshot) => {
         classData = snapshot.val() || {};
-        // Chỉ render lại nếu đang xem danh sách để tránh render ngầm gây lag
         if (currentSubject && document.getElementById('detail-view').style.display !== 'none') {
             renderStudentList(currentSubject);
         }
     });
 });
 
-// --- HELPER: TOAST (Chỉ hiện chữ) ---
-function showToast(message, type = 'info') {
+function showToast(message) {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.innerText = message; // Chỉ text, không icon
-    
+    toast.className = 'toast';
+    toast.innerText = message;
     container.appendChild(toast);
     setTimeout(() => {
         toast.style.opacity = '0';
@@ -84,15 +68,17 @@ function showToast(message, type = 'info') {
     }, 2500);
 }
 
-// --- AUTHENTICATION ---
+// --- AUTH LOGIC MỚI ---
 window.handleAuthAction = function() {
     if (currentUser) {
-        // Mở Modal xác nhận đăng xuất
         document.getElementById('modal-logout-confirm').style.display = 'block';
     } else {
+        document.getElementById('login-username').value = ""; // Reset input
         document.getElementById('password-input').value = "";
         document.getElementById('login-error').style.display = 'none';
         document.getElementById('modal-login').style.display = 'block';
+        // Focus vào ô nhập user
+        setTimeout(() => document.getElementById('login-username').focus(), 100);
     }
 }
 
@@ -104,17 +90,21 @@ window.confirmLogout = function() {
     showDashboard();
 }
 
+// Logic đăng nhập nhập tay
 window.performLogin = function() {
-    const user = document.getElementById('login-user-select').value;
-    const pass = document.getElementById('password-input').value;
+    const usernameInput = document.getElementById('login-username').value.trim().toLowerCase(); // Tự động viết thường
+    const passwordInput = document.getElementById('password-input').value;
 
-    if (ACCOUNTS[user] === pass) {
-        currentUser = user;
+    const account = ACCOUNTS[usernameInput];
+
+    if (account && account.pass === passwordInput) {
+        currentUser = usernameInput;
         closeModal('modal-login');
         updateAuthButton();
-        showToast(`Xin chào ${ACCOUNT_NAMES[user]}`);
+        showToast(`Xin chào ${account.name}`);
     } else {
         document.getElementById('login-error').style.display = 'block';
+        document.getElementById('login-error').innerText = "Tên tài khoản hoặc mật khẩu sai";
     }
 }
 
@@ -129,7 +119,7 @@ function updateAuthButton() {
     }
 }
 
-// --- NAVIGATION ---
+// --- RENDER ---
 window.renderDashboard = function() {
     const grid = document.getElementById('subject-grid');
     grid.innerHTML = "";
@@ -139,8 +129,9 @@ window.renderDashboard = function() {
         card.className = 'subject-card';
         card.onclick = () => openSubject(sub);
         
+        // Dùng thẻ <i> cho icon RemixIcon
         card.innerHTML = `
-            <span class="sbj-icon">${sub.icon}</span>
+            <i class="subject-icon-box ${sub.icon}"></i>
             <span class="sbj-name">${sub.name}</span>
         `;
         grid.appendChild(card);
@@ -149,7 +140,7 @@ window.renderDashboard = function() {
 
 window.openSubject = function(subjectObj) {
     if (subjectObj.adminOnly && currentUser !== 'admin') {
-        showToast("Mục này chỉ dành cho ADMIN", "error");
+        showToast("Mục này chỉ dành cho ADMIN");
         return;
     }
 
@@ -167,7 +158,6 @@ window.showDashboard = function() {
     document.getElementById('dashboard-view').style.display = 'block';
 }
 
-// Render sử dụng DocumentFragment để tối ưu hiệu suất (giảm lag)
 window.renderStudentList = function(subjectObj) {
     const listContainer = document.getElementById('student-list');
     listContainer.innerHTML = ""; 
@@ -202,22 +192,20 @@ function calculateTotal(studentId, subjectId) {
     const records = Object.values(classData[studentId]);
     const filtered = records.filter(item => (item.subject || 'Khác') === subjectId);
     const total = filtered.reduce((sum, item) => sum + item.score, 0);
-    // Làm tròn 1 chữ số thập phân để tránh lỗi 0.300000004
     return Math.round(total * 10) / 10;
 }
 
-// --- MODALS & ACTIONS ---
+// --- MODAL HELPERS ---
 window.closeModal = (id) => document.getElementById(id).style.display = 'none';
 
 window.openOptionModal = function(id, name) {
     currentStudentId = id;
     document.getElementById('opt-student-name').innerText = name;
-    document.getElementById('opt-subject-name').innerText = "Môn: " + currentSubject.name;
+    document.getElementById('opt-subject-name').innerText = currentSubject.name;
     
-    // Ẩn nút nhập điểm nếu chưa đăng nhập
     const btnAdd = document.getElementById('btn-action-add');
     if (currentUser) {
-        btnAdd.style.display = 'flex';
+        btnAdd.style.display = 'block';
     } else {
         btnAdd.style.display = 'none';
     }
@@ -235,7 +223,7 @@ window.checkPermissionAndShowAdd = function() {
     
     document.getElementById('score-input').value = "";
     document.getElementById('reason-input').value = "";
-    document.getElementById('score-input').focus(); 
+    setTimeout(() => document.getElementById('score-input').focus(), 100);
     setScoreType('plus');
 }
 
@@ -252,7 +240,7 @@ window.saveScore = function() {
     const reason = document.getElementById('reason-input').value;
 
     if (!val) {
-        showToast("Vui lòng nhập số điểm!", "error");
+        showToast("Vui lòng nhập số điểm!");
         return;
     }
     
@@ -263,11 +251,11 @@ window.saveScore = function() {
         score: score,
         subject: currentSubject.id, 
         reason: reason || "Không có lý do",
-        date: new Date().toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit'}), // Lưu ngày ngắn gọn
+        date: new Date().toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit'}),
         user: currentUser 
     }).then(() => {
         closeModal('modal-add');
-        showToast("Đã lưu điểm thành công", "success");
+        showToast("Đã lưu điểm");
     });
 }
 
@@ -275,15 +263,11 @@ window.viewHistory = function() {
     closeModal('modal-options');
     document.getElementById('modal-history').style.display = 'block';
     
-    // Ẩn/Hiện cột xóa
-    const colActionHeader = document.getElementById('col-action-header');
-    colActionHeader.style.display = currentUser ? 'table-cell' : 'none';
-
     const tbody = document.getElementById('history-body');
     tbody.innerHTML = "";
     
     if (!classData[currentStudentId]) {
-        tbody.innerHTML = "<tr><td colspan='4' class='text-center'>Trống</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='3' style='text-align:center; padding: 20px;'>Chưa có dữ liệu</td></tr>";
         return;
     }
 
@@ -291,32 +275,33 @@ window.viewHistory = function() {
     const filteredRecords = records.filter(([key, item]) => (item.subject || 'Khác') === currentSubject.id);
 
     if (filteredRecords.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='4' class='text-center'>Chưa có lịch sử</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='3' style='text-align:center; padding: 20px;'>Chưa có lịch sử</td></tr>";
         return;
     }
 
     filteredRecords.forEach(([key, item]) => {
         const color = item.score >= 0 ? 'var(--success)' : 'var(--danger)';
-        const userLabel = ACCOUNT_NAMES[item.user] ? ACCOUNT_NAMES[item.user] : 'Ẩn danh';
+        const accName = ACCOUNTS[item.user] ? ACCOUNTS[item.user].name : 'Ẩn danh';
         
-        // Cột ngày + người nhập
-        const dateHtml = `
-            <div>${item.date}</div>
-            <div class="user-tag">${userLabel}</div>
-        `;
-
-        let rowHtml = `
-            <td>${dateHtml}</td>
-            <td>${item.reason}</td>
-            <td class="text-right" style="color:${color}; font-weight:bold">${item.score}</td>
-        `;
-
+        let deleteBtn = '';
         if (currentUser) {
-            rowHtml += `<td class="text-center"><button class="btn-del" onclick="deleteScore('${key}')">Xóa</button></td>`;
+            deleteBtn = ` <button class="btn-del-text" onclick="deleteScore('${key}')">Xóa</button>`;
         }
         
         const tr = document.createElement('tr');
-        tr.innerHTML = rowHtml;
+        tr.innerHTML = `
+            <td>
+                <span class="date-tag">${item.date}</span>
+                <span class="user-tag">Bởi: ${accName}</span>
+            </td>
+            <td>
+                ${item.reason}
+                ${deleteBtn}
+            </td>
+            <td class="text-right" style="color:${color}; font-weight:bold">
+                ${item.score > 0 ? '+' : ''}${item.score}
+            </td>
+        `;
         tbody.appendChild(tr);
     });
 }
@@ -326,7 +311,7 @@ window.deleteScore = function(key) {
     if (confirm("Xóa điểm này?")) {
         remove(ref(db, `students/${currentStudentId}/${key}`)).then(() => {
             viewHistory(); 
-            showToast("Đã xóa dữ liệu");
+            showToast("Đã xóa");
         });
     }
 }
