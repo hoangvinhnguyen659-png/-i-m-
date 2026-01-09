@@ -35,7 +35,7 @@ const SUBJECTS = [
     { id: 'Khác', name: 'Hoạt động khác', icon: 'ri-star-smile-line', adminOnly: true }
 ];
 
-[span_0](start_span)// DANH SÁCH HỌC SINH MỚI (42 Em)[span_0](end_span)
+// DANH SÁCH HỌC SINH MỚI (42 Em)
 const STUDENT_NAMES = [
     "Nguyễn Ngọc Quỳnh An",
     "Trần Bình An",
