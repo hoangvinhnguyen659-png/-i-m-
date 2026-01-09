@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quản Lý Điểm Cộng</title>
+    <title>Quản Lý Điểm</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -21,8 +21,7 @@
     <main>
         <div id="dashboard-view">
             <p class="section-title">Danh mục môn học</p>
-            <div class="subject-grid" id="subject-grid">
-                </div>
+            <div class="subject-grid" id="subject-grid"></div>
         </div>
 
         <div id="detail-view" style="display: none;">
@@ -49,37 +48,57 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Tài khoản</label>
-                    <select id="login-user-select">
-                        <option value="admin">Quản trị viên (Admin)</option>
-                        <option value="to1">Tổ 1</option>
-                        <option value="to2">Tổ 2</option>
-                        <option value="to3">Tổ 3</option>
-                        <option value="to4">Tổ 4</option>
-                    </select>
+                    <div class="select-wrapper">
+                        <select id="login-user-select">
+                            <option value="admin">Quản trị viên (Admin)</option>
+                            <option value="to1">Tổ 1</option>
+                            <option value="to2">Tổ 2</option>
+                            <option value="to3">Tổ 3</option>
+                            <option value="to4">Tổ 4</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Mật khẩu</label>
                     <input type="password" id="password-input" placeholder="Nhập mật mã...">
                 </div>
-                <p id="login-error" class="error-text">⚠️ Mật khẩu không chính xác</p>
-                <button class="btn-primary full-width large-btn" onclick="performLogin()">Đăng nhập</button>
+                <p id="login-error" class="error-text">Mật khẩu không chính xác</p>
+                <button class="btn-primary full-width large-btn" onclick="performLogin()">Xác thực</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-logout-confirm" class="modal">
+        <div class="modal-content small-modal text-center">
+            <div class="modal-body" style="padding-top: 24px;">
+                <h3 style="margin: 0 0 10px;">Đăng xuất</h3>
+                <p style="color: #666; margin-bottom: 24px;">Bạn có chắc chắn muốn đăng xuất?</p>
+                <div class="action-buttons horizontal">
+                    <button class="btn-secondary" onclick="closeModal('modal-logout-confirm')">Hủy</button>
+                    <button class="btn-danger" onclick="confirmLogout()">Đăng xuất</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="modal-options" class="modal">
-        <div class="modal-content small-modal bottom-sheet">
-            <div class="modal-header">
-                <h2 id="opt-student-name"></h2>
-                <span class="close-btn" onclick="closeModal('modal-options')">&times;</span>
+        <div class="modal-content bottom-sheet-styled">
+            <div class="sheet-header">
+                <h3 id="opt-student-name">Học sinh A</h3>
+                <p id="opt-subject-name" class="sheet-subtitle">Môn Toán</p>
             </div>
-            <div class="action-buttons">
-                <button id="btn-action-add" class="btn-primary full-width" onclick="checkPermissionAndShowAdd()">
-                    Nhập điểm môn <span id="opt-subject-name"></span>
+            
+            <div class="sheet-body">
+                <button id="btn-action-add" class="sheet-btn primary" onclick="checkPermissionAndShowAdd()">
+                    <span class="sheet-icon">✏️</span> Nhập điểm
                 </button>
                 
-                <button class="btn-secondary full-width" onclick="viewHistory()">
-                    Xem lịch sử
+                <button class="sheet-btn secondary" onclick="viewHistory()">
+                    <span class="sheet-icon">🕒</span> Xem lịch sử
+                </button>
+
+                <button class="sheet-btn cancel" onclick="closeModal('modal-options')">
+                    Đóng
                 </button>
             </div>
         </div>
@@ -94,7 +113,7 @@
             
             <div class="student-info-bar">
                 <span id="add-student-name" class="st-name"></span>
-                <span id="add-subject-tag" class="sb-tag">Toán</span>
+                <span id="add-subject-tag" class="sb-tag"></span>
             </div>
 
             <div class="score-type-switch">
@@ -111,16 +130,16 @@
                 </div>
                 
                 <div class="modern-input-group">
-                    <label>Lý do / Nội dung</label>
+                    <label>Lý do</label>
                     <div class="input-wrapper">
-                        <input type="text" id="reason-input" placeholder="Ví dụ: Phát biểu bài..." class="modern-input">
+                        <input type="text" id="reason-input" placeholder="Nhập lý do..." class="modern-input">
                     </div>
                 </div>
             </div>
 
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="closeModal('modal-add')">Hủy</button>
-                <button class="btn-primary" onclick="saveScore()">Lưu Kết Quả</button>
+                <button class="btn-primary" onclick="saveScore()">Lưu</button>
             </div>
         </div>
     </div>
@@ -131,15 +150,12 @@
                 <h2>Lịch Sử</h2>
                 <span class="close-btn" onclick="closeModal('modal-history')">&times;</span>
             </div>
-            <div class="history-context">
-                <span id="hist-subject-name"></span> - <span id="hist-student-name"></span>
-            </div>
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
-                            <th>Ngày</th>
-                            <th>Nội dung</th>
+                            <th width="30%">Ngày/Người</th>
+                            <th>Lý do</th>
                             <th class="text-right">Điểm</th>
                             <th class="text-center" id="col-action-header">#</th>
                         </tr>
