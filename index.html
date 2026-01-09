@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thi Đua Lớp Học</title>
+    <title>Quản Lý Thi Đua Lớp</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -22,15 +22,15 @@
             <span>Tổng điểm</span>
         </div>
         <div id="student-list" class="list-container">
-            <div class="loading">Đang tải dữ liệu...</div>
+            <div class="loading">Đang tải dữ liệu từ vệ tinh...</div>
         </div>
     </main>
 
     <div id="modal-login" class="modal">
         <div class="modal-content small-modal">
             <span class="close-btn" onclick="closeModal('modal-login')">&times;</span>
-            <h2>Xác thực Giáo Viên</h2>
-            <input type="password" id="password-input" placeholder="Nhập mật khẩu quản trị">
+            <h2>Xác thực Admin</h2>
+            <input type="password" id="password-input" placeholder="Nhập mật khẩu">
             <button class="btn-primary full-width" onclick="performLogin()">Đăng nhập</button>
             <p id="login-error" class="error-text">Mật khẩu không đúng</p>
         </div>
@@ -41,8 +41,8 @@
             <span class="close-btn" onclick="closeModal('modal-options')">&times;</span>
             <h2 id="opt-student-name" class="highlight-text"></h2>
             <div class="action-buttons">
-                <button class="btn-primary full-width" onclick="checkPermissionAndShowAdd()">Nhập điểm</button>
-                <button class="btn-info full-width" onclick="viewHistory()">Xem Lịch Sử & Xóa</button>
+                <button class="btn-primary full-width" onclick="checkPermissionAndShowAdd()">Nhập điểm mới</button>
+                <button class="btn-info full-width" onclick="viewHistory()">Lịch sử & Xóa</button>
             </div>
         </div>
     </div>
@@ -50,7 +50,7 @@
     <div id="modal-add" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-add')">&times;</span>
-            <h2>Nhập điểm: <span id="add-student-name" style="color: var(--primary-color)"></span></h2>
+            <h2>Nhập điểm cho: <span id="add-student-name" style="color: var(--primary-color)"></span></h2>
             
             <div class="score-type-switch">
                 <button id="btn-plus" class="type-btn active" onclick="setScoreType('plus')">Điểm Cộng (+)</button>
@@ -59,17 +59,17 @@
 
             <div class="form-group">
                 <label>Số điểm:</label>
-                <input type="number" id="score-input" placeholder="Nhập số (VD: 0.5)" inputmode="decimal" step="0.1">
+                <input type="number" id="score-input" placeholder="Nhập số điểm" inputmode="decimal" step="0.1">
             </div>
 
             <div class="form-group">
                 <label>Lý do:</label>
-                <input type="text" id="reason-input" placeholder="Nhập lý do...">
+                <input type="text" id="reason-input" placeholder="Lý do cộng/trừ...">
             </div>
 
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="closeModal('modal-add')">Hủy</button>
-                <button class="btn-primary" onclick="saveScore()">Lưu</button>
+                <button class="btn-primary" onclick="saveScore()">Lưu kết quả</button>
             </div>
         </div>
     </div>
@@ -79,17 +79,16 @@
             <span class="close-btn" onclick="closeModal('modal-history')">&times;</span>
             <h2>Lịch sử: <span id="hist-student-name"></span></h2>
             <div class="table-wrapper">
-                <table id="history-table">
+                <table>
                     <thead>
                         <tr>
-                            <th>Thời gian</th>
+                            <th>Ngày giờ</th>
                             <th>Lý do</th>
                             <th class="text-right">Điểm</th>
-                            <th class="text-center" width="50">Xóa</th>
+                            <th class="text-center">Xóa</th>
                         </tr>
                     </thead>
-                    <tbody id="history-body">
-                        </tbody>
+                    <tbody id="history-body"></tbody>
                 </table>
             </div>
         </div>
