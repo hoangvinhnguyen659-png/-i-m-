@@ -27,8 +27,8 @@
 
         <div id="detail-view" style="display: none;">
             <div class="detail-header">
-                <button class="btn-text-only" onclick="showDashboard()">
-                    Quay lại
+                <button class="btn-back" onclick="showDashboard()">
+                    <i class="ri-arrow-left-s-line"></i> Quay lại
                 </button>
                 <div class="subject-badge" id="current-subject-badge">Toán</div>
             </div>
@@ -48,11 +48,11 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Tài khoản</label>
-                    <input type="text" id="login-username" placeholder="Nhập tên tài khoản..." autocomplete="off">
+                    <input type="text" id="login-username" class="modern-input" placeholder="Nhập tên tài khoản..." autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label>Mật khẩu</label>
-                    <input type="password" id="password-input" placeholder="Nhập mật mã...">
+                    <input type="password" id="password-input" class="modern-input" placeholder="Nhập mật mã...">
                 </div>
                 <p id="login-error" class="error-text">Thông tin không chính xác</p>
                 <button class="btn-primary full-width large-btn" onclick="performLogin()">Đăng nhập</button>
@@ -62,12 +62,15 @@
 
     <div id="modal-logout-confirm" class="modal">
         <div class="modal-content small-modal text-center">
-            <div class="modal-body" style="padding-top: 24px;">
-                <h3 style="margin: 0 0 10px;">Đăng xuất</h3>
-                <p style="color: #666; margin-bottom: 24px;">Bạn muốn đăng xuất khỏi hệ thống?</p>
+            <div class="modal-body" style="padding: 24px 20px;">
+                <div class="icon-warning-circle">
+                    <i class="ri-logout-box-r-line"></i>
+                </div>
+                <h3 style="margin: 10px 0 5px; font-size: 1.1rem;">Đăng xuất</h3>
+                <p style="color: #64748b; margin-bottom: 24px; font-size: 0.95rem;">Bạn muốn đăng xuất khỏi hệ thống?</p>
                 <div class="action-buttons horizontal">
                     <button class="btn-secondary" onclick="closeModal('modal-logout-confirm')">Hủy</button>
-                    <button class="btn-danger" onclick="confirmLogout()">Đăng xuất</button>
+                    <button class="btn-danger-soft" onclick="confirmLogout()">Đăng xuất</button>
                 </div>
             </div>
         </div>
@@ -81,10 +84,10 @@
             </div>
             <div class="sheet-body">
                 <button id="btn-action-add" class="sheet-btn primary" onclick="checkPermissionAndShowAdd()">
-                    Nhập điểm
+                    <i class="ri-add-circle-line"></i> Nhập điểm
                 </button>
                 <button class="sheet-btn secondary" onclick="viewHistory()">
-                    Xem lịch sử
+                    <i class="ri-history-line"></i> Xem lịch sử
                 </button>
                 <button class="sheet-btn cancel" onclick="closeModal('modal-options')">
                     Đóng
@@ -100,31 +103,37 @@
                 <span class="close-btn" onclick="closeModal('modal-add')">&times;</span>
             </div>
             
-            <div class="student-info-bar">
-                <span id="add-student-name" class="st-name"></span>
-                <span id="add-subject-tag" class="sb-tag"></span>
-            </div>
-
-            <div class="score-type-switch">
-                <button id="btn-plus" class="type-btn active" onclick="setScoreType('plus')">Điểm Cộng</button>
-                <button id="btn-minus" class="type-btn" onclick="setScoreType('minus')">Điểm Trừ</button>
-            </div>
-
-            <div class="input-grid">
-                <div class="modern-input-group">
-                    <label>Số điểm</label>
-                    <input type="number" id="score-input" placeholder="0.0" inputmode="decimal" step="0.1" class="modern-input main-score">
+            <div class="modal-body">
+                <div class="student-info-bar">
+                    <span id="add-student-name" class="st-name"></span>
+                    <span id="add-subject-tag" class="sb-tag"></span>
                 </div>
-                
-                <div class="modern-input-group">
-                    <label>Lý do</label>
-                    <input type="text" id="reason-input" placeholder="Nhập lý do..." class="modern-input">
-                </div>
-            </div>
 
-            <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeModal('modal-add')">Hủy</button>
-                <button class="btn-primary" onclick="saveScore()">Lưu</button>
+                <div class="score-type-switch">
+                    <button id="btn-plus" class="type-btn active" onclick="setScoreType('plus')">
+                        <i class="ri-add-line"></i> Điểm Cộng
+                    </button>
+                    <button id="btn-minus" class="type-btn" onclick="setScoreType('minus')">
+                        <i class="ri-subtract-line"></i> Điểm Trừ
+                    </button>
+                </div>
+
+                <div class="input-grid">
+                    <div class="modern-input-group">
+                        <label>Số điểm</label>
+                        <input type="number" id="score-input" placeholder="0.0" inputmode="decimal" step="0.1" class="modern-input main-score">
+                    </div>
+                    
+                    <div class="modern-input-group">
+                        <label>Lý do</label>
+                        <input type="text" id="reason-input" placeholder="Nhập lý do..." class="modern-input">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeModal('modal-add')">Hủy</button>
+                    <button class="btn-primary" onclick="saveScore()">Lưu</button>
+                </div>
             </div>
         </div>
     </div>
@@ -152,19 +161,19 @@
 
     <div id="modal-delete-confirm" class="modal">
         <div class="modal-content small-modal">
-            <div class="modal-header">
+            <div class="modal-header no-border">
                 <h2>Xác nhận xóa</h2>
-                <span class="close-btn" onclick="closeModal('modal-delete-confirm')">&times;</span>
             </div>
             <div class="modal-body">
-                <p style="color: var(--text-sub); margin-bottom: 15px;">Bạn đang xóa một điểm số. Hành động này sẽ được lưu lại.</p>
+                <p style="color: var(--text-sub); margin-bottom: 20px; font-size: 0.9rem;">
+                    Hành động này sẽ được lưu lại trong lịch sử. Vui lòng nhập lý do.
+                </p>
                 <div class="form-group">
-                    <label>Lý do xóa <span style="color:red">*</span></label>
-                    <input type="text" id="delete-reason-input" placeholder="Ví dụ: Nhập nhầm điểm..." autocomplete="off">
+                    <input type="text" id="delete-reason-input" class="modern-input" placeholder="Ví dụ: Nhập nhầm điểm..." autocomplete="off">
                 </div>
-                <div class="action-buttons horizontal" style="display: flex; gap: 10px; margin-top: 20px;">
+                <div class="action-buttons horizontal" style="margin-top: 24px;">
                     <button class="btn-secondary" onclick="closeModal('modal-delete-confirm')">Hủy</button>
-                    <button class="btn-danger" style="flex:1; background: var(--danger); color: white; border:none; border-radius:10px; font-weight:600;" onclick="confirmDeleteAction()">Xác nhận Xóa</button>
+                    <button class="btn-danger" onclick="confirmDeleteAction()">Xác nhận Xóa</button>
                 </div>
             </div>
         </div>
