@@ -14,7 +14,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-[span_1](start_span)// Danh sách 42 học sinh từ file của bạn[span_1](end_span)
+[span_0](start_span)// Danh sách 42 học sinh chính xác từ file của bạn[span_0](end_span)
 const STUDENT_NAMES = [
     "Nguyễn Ngọc Quỳnh An", "Trần Bình An", "Nguyễn Ngọc Nguyên Anh", "Trần Hoàng Anh",
     "Nguyễn Châu Thái Bảo", "Phan Trung Can", "Nguyễn Minh Đạt", "Lê Nguyễn Hồng Đăng",
@@ -59,6 +59,7 @@ let currentSubject = null;
 let pendingDeleteKey = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+    // SỬA LỖI TRẮNG TRANG: Luôn render giao diện trước khi tải dữ liệu Firebase
     renderDashboard();
     
     const dataRef = ref(db, 'students');
@@ -66,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         classData = snapshot.val() || {};
         if (currentSubject && document.getElementById('detail-view').style.display !== 'none') {
             renderStudentList(currentSubject);
+            filterStudents(); // Đảm bảo danh sách vẫn lọc đúng khi dữ liệu cập nhật
         }
         if(document.getElementById('modal-history').style.display.includes('block') || document.getElementById('modal-history').style.display.includes('flex')) {
             viewHistory();
@@ -75,9 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginInputs = [document.getElementById('login-username'), document.getElementById('password-input')];
     loginInputs.forEach(input => {
         input.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                performLogin();
-            }
+            if (event.key === 'Enter') performLogin();
         });
     });
 });
@@ -92,6 +92,16 @@ function showToast(message) {
         toast.style.opacity = '0';
         setTimeout(() => toast.remove(), 300);
     }, 2500);
+}
+
+// TÌM KIẾM
+window.filterStudents = function() {
+    const searchTerm = document.getElementById('search-student')?.value.toLowerCase().trim() || "";
+    const rows = document.querySelectorAll('.student-row');
+    rows.forEach(row => {
+        const name = row.querySelector('.s-name').innerText.toLowerCase();
+        row.style.display = name.includes(searchTerm) ? 'flex' : 'none';
+    });
 }
 
 // AUTH
@@ -118,7 +128,6 @@ window.confirmLogout = function() {
 window.performLogin = function() {
     const usernameInput = document.getElementById('login-username').value.trim().toLowerCase();
     const passwordInput = document.getElementById('password-input').value;
-
     const account = ACCOUNTS[usernameInput];
 
     if (account && account.pass === passwordInput) {
@@ -128,7 +137,7 @@ window.performLogin = function() {
         showToast(`Xin chào ${account.name}`);
     } else {
         document.getElementById('login-error').style.display = 'block';
-        document.getElementById('login-error').innerText = "Tên tài khoản hoặc mật khẩu sai";
+        document.getElementById('login-error').innerText = "Thông tin không chính xác";
     }
 }
 
@@ -173,6 +182,7 @@ window.openSubject = function(subjectObj) {
 
 window.showDashboard = function() {
     currentSubject = null;
+    if (document.getElementById('search-student')) document.getElementById('search-student').value = "";
     document.getElementById('detail-view').style.display = 'none';
     document.getElementById('dashboard-view').style.display = 'block';
 }
@@ -184,10 +194,7 @@ window.renderStudentList = function(subjectObj) {
 
     for (let i = 1; i <= TOTAL_STUDENTS; i++) {
         const studentId = `student_${i}`;
-        
-        // Lấy tên từ danh sách STUDENT_NAMES (i-1 vì mảng bắt đầu từ vị trí 0)
         const name = STUDENT_NAMES[i - 1] || `Học sinh ${i}`;
-        
         const total = calculateTotal(studentId, subjectObj.id);
         
         const row = document.createElement('div');
@@ -198,11 +205,9 @@ window.renderStudentList = function(subjectObj) {
         if (total > 0) scoreClass = 'pos';
         if (total < 0) scoreClass = 'neg';
 
-        const displayScore = (total > 0 ? '+' : '') + total;
-
         row.innerHTML = `
             <span class="s-name">${name}</span>
-            <span class="s-score ${scoreClass}">${displayScore}</span>
+            <span class="s-score ${scoreClass}">${(total > 0 ? '+' : '') + total}</span>
         `;
         fragment.appendChild(row);
     }
@@ -219,7 +224,7 @@ function calculateTotal(studentId, subjectId) {
     return Math.round(total * 10) / 10;
 }
 
-// MODAL HELPERS
+// MODALS
 window.closeModal = (id) => document.getElementById(id).style.display = 'none';
 
 window.openOptionModal = function(id, name) {
@@ -228,11 +233,7 @@ window.openOptionModal = function(id, name) {
     document.getElementById('opt-subject-name').innerText = currentSubject.name;
     
     const btnAdd = document.getElementById('btn-action-add');
-    if (currentUser) {
-        btnAdd.style.display = 'flex'; 
-    } else {
-        btnAdd.style.display = 'none';
-    }
+    btnAdd.style.display = currentUser ? 'flex' : 'none';
     document.getElementById('modal-options').style.display = 'block';
 }
 
@@ -241,13 +242,11 @@ window.checkPermissionAndShowAdd = function() {
     if (!currentUser) return;
     
     document.getElementById('modal-add').style.display = 'block';
-    
     document.getElementById('add-student-name').innerText = document.getElementById('opt-student-name').innerText;
     document.getElementById('add-subject-tag').innerText = currentSubject.name;
     
     document.getElementById('score-input').value = "";
     document.getElementById('reason-input').value = "";
-    
     setScoreType('plus');
     
     setTimeout(() => document.getElementById('score-input').focus(), 150);
@@ -262,27 +261,20 @@ window.setScoreType = function(type) {
     const btnSave = document.querySelector('.large-save');
 
     if (type === 'plus') {
-        segControl.classList.remove('is-minus');
-        segControl.classList.add('is-plus');
-        segPlus.classList.add('active');
-        segMinus.classList.remove('active');
+        segControl.classList.replace('is-minus', 'is-plus');
+        segPlus.classList.add('active'); segMinus.classList.remove('active');
         heroContainer.classList.remove('minus-mode');
         btnSave.style.background = 'var(--success)';
-        btnSave.style.boxShadow = '0 8px 20px -6px rgba(22, 163, 74, 0.4)';
     } else {
-        segControl.classList.remove('is-plus');
-        segControl.classList.add('is-minus');
-        segPlus.classList.remove('active');
-        segMinus.classList.add('active');
+        segControl.classList.replace('is-plus', 'is-minus');
+        segMinus.classList.add('active'); segPlus.classList.remove('active');
         heroContainer.classList.add('minus-mode');
         btnSave.style.background = 'var(--danger)';
-        btnSave.style.boxShadow = '0 8px 20px -6px rgba(220, 38, 38, 0.4)';
     }
 }
 
 window.saveScore = function() {
     if (!currentUser) return; 
-
     const val = document.getElementById('score-input').value;
     const reason = document.getElementById('reason-input').value;
 
@@ -310,7 +302,6 @@ window.saveScore = function() {
 window.viewHistory = function() {
     closeModal('modal-options');
     document.getElementById('modal-history').style.display = 'block';
-    
     const tbody = document.getElementById('history-body');
     tbody.innerHTML = "";
     
@@ -330,24 +321,10 @@ window.viewHistory = function() {
     filteredRecords.forEach(([key, item]) => {
         const isDeleted = item.deleted === true;
         const color = item.score >= 0 ? 'var(--success)' : 'var(--danger)';
-        const accName = ACCOUNTS[item.user] ? ACCOUNTS[item.user].name : 'Ẩn danh';
-        
-        let rowClass = isDeleted ? 'row-deleted' : '';
-        let scoreStyle = isDeleted ? '' : `color:${color}; font-weight:bold`;
-
-        let deleteBtn = '';
-        if (currentUser && !isDeleted) {
-            deleteBtn = ` <button class="btn-del-text" onclick="requestDelete('${key}')">Xóa</button>`;
-        }
-
-        let deletedInfo = '';
-        if (isDeleted) {
-            const delUser = ACCOUNTS[item.deletedBy] ? ACCOUNTS[item.deletedBy].name : 'Ẩn danh';
-            deletedInfo = `<span class="deleted-info">Đã xóa bởi ${delUser}: ${item.deleteReason}</span>`;
-        }
+        const accName = ACCOUNTS[item.user]?.name || 'Ẩn danh';
         
         const tr = document.createElement('tr');
-        tr.className = rowClass;
+        tr.className = isDeleted ? 'row-deleted' : '';
         tr.innerHTML = `
             <td>
                 <span class="date-tag">${item.date}</span>
@@ -355,10 +332,10 @@ window.viewHistory = function() {
             </td>
             <td>
                 ${item.reason}
-                ${deleteBtn}
-                ${deletedInfo}
+                ${(currentUser && !isDeleted) ? `<button class="btn-del-text" onclick="requestDelete('${key}')">Xóa</button>` : ''}
+                ${isDeleted ? `<span class="deleted-info">Đã xóa bởi ${ACCOUNTS[item.deletedBy]?.name || 'Ẩn danh'}: ${item.deleteReason}</span>` : ''}
             </td>
-            <td class="text-right s-score-cell" style="${scoreStyle}">
+            <td class="text-right s-score-cell" style="${isDeleted ? '' : `color:${color}; font-weight:bold`}">
                 ${item.score > 0 ? '+' : ''}${item.score}
             </td>
         `;
@@ -376,13 +353,11 @@ window.requestDelete = function(key) {
 
 window.confirmDeleteAction = function() {
     if (!pendingDeleteKey || !currentUser) return;
-
     const reason = document.getElementById('delete-reason-input').value.trim();
     if (!reason) {
         showToast("Vui lòng nhập lý do xóa!");
         return; 
     }
-
     update(ref(db, `students/${currentStudentId}/${pendingDeleteKey}`), {
         deleted: true,
         deletedBy: currentUser,
@@ -395,6 +370,4 @@ window.confirmDeleteAction = function() {
     });
 }
 
-window.onclick = (e) => { 
-    if (e.target.classList.contains('modal')) closeModal(e.target.id); 
-}
+window.onclick = (e) => { if (e.target.classList.contains('modal')) closeModal(e.target.id); }
