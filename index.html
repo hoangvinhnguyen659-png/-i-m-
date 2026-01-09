@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Quản Lý Điểm</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -26,8 +27,7 @@
 
         <div id="detail-view" style="display: none;">
             <div class="detail-header">
-                <button class="btn-back" onclick="showDashboard()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <button class="btn-text-only" onclick="showDashboard()">
                     Quay lại
                 </button>
                 <div class="subject-badge" id="current-subject-badge">Toán</div>
@@ -40,30 +40,22 @@
     </main>
 
     <div id="modal-login" class="modal">
-        <div class="modal-content small-modal login-modal">
-            <div class="modal-header center-header">
+        <div class="modal-content small-modal">
+            <div class="modal-header">
                 <h2>Đăng Nhập</h2>
                 <span class="close-btn" onclick="closeModal('modal-login')">&times;</span>
             </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label>Tài khoản</label>
-                    <div class="select-wrapper">
-                        <select id="login-user-select">
-                            <option value="admin">Quản trị viên (Admin)</option>
-                            <option value="to1">Tổ 1</option>
-                            <option value="to2">Tổ 2</option>
-                            <option value="to3">Tổ 3</option>
-                            <option value="to4">Tổ 4</option>
-                        </select>
-                    </div>
+                    <input type="text" id="login-username" placeholder="Nhập tên tài khoản..." autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label>Mật khẩu</label>
                     <input type="password" id="password-input" placeholder="Nhập mật mã...">
                 </div>
-                <p id="login-error" class="error-text">Mật khẩu không chính xác</p>
-                <button class="btn-primary full-width large-btn" onclick="performLogin()">Xác thực</button>
+                <p id="login-error" class="error-text">Thông tin không chính xác</p>
+                <button class="btn-primary full-width large-btn" onclick="performLogin()">Đăng nhập</button>
             </div>
         </div>
     </div>
@@ -72,7 +64,7 @@
         <div class="modal-content small-modal text-center">
             <div class="modal-body" style="padding-top: 24px;">
                 <h3 style="margin: 0 0 10px;">Đăng xuất</h3>
-                <p style="color: #666; margin-bottom: 24px;">Bạn có chắc chắn muốn đăng xuất?</p>
+                <p style="color: #666; margin-bottom: 24px;">Bạn muốn đăng xuất khỏi hệ thống?</p>
                 <div class="action-buttons horizontal">
                     <button class="btn-secondary" onclick="closeModal('modal-logout-confirm')">Hủy</button>
                     <button class="btn-danger" onclick="confirmLogout()">Đăng xuất</button>
@@ -87,16 +79,13 @@
                 <h3 id="opt-student-name">Học sinh A</h3>
                 <p id="opt-subject-name" class="sheet-subtitle">Môn Toán</p>
             </div>
-            
             <div class="sheet-body">
                 <button id="btn-action-add" class="sheet-btn primary" onclick="checkPermissionAndShowAdd()">
-                    <span class="sheet-icon">✏️</span> Nhập điểm
+                    Nhập điểm
                 </button>
-                
                 <button class="sheet-btn secondary" onclick="viewHistory()">
-                    <span class="sheet-icon">🕒</span> Xem lịch sử
+                    Xem lịch sử
                 </button>
-
                 <button class="sheet-btn cancel" onclick="closeModal('modal-options')">
                     Đóng
                 </button>
@@ -117,23 +106,19 @@
             </div>
 
             <div class="score-type-switch">
-                <button id="btn-plus" class="type-btn active" onclick="setScoreType('plus')">Điểm Cộng (+)</button>
-                <button id="btn-minus" class="type-btn" onclick="setScoreType('minus')">Điểm Trừ (-)</button>
+                <button id="btn-plus" class="type-btn active" onclick="setScoreType('plus')">Điểm Cộng</button>
+                <button id="btn-minus" class="type-btn" onclick="setScoreType('minus')">Điểm Trừ</button>
             </div>
 
             <div class="input-grid">
                 <div class="modern-input-group">
                     <label>Số điểm</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="score-input" placeholder="0.0" inputmode="decimal" step="0.1" class="modern-input main-score">
-                    </div>
+                    <input type="number" id="score-input" placeholder="0.0" inputmode="decimal" step="0.1" class="modern-input main-score">
                 </div>
                 
                 <div class="modern-input-group">
                     <label>Lý do</label>
-                    <div class="input-wrapper">
-                        <input type="text" id="reason-input" placeholder="Nhập lý do..." class="modern-input">
-                    </div>
+                    <input type="text" id="reason-input" placeholder="Nhập lý do..." class="modern-input">
                 </div>
             </div>
 
@@ -151,13 +136,12 @@
                 <span class="close-btn" onclick="closeModal('modal-history')">&times;</span>
             </div>
             <div class="table-wrapper">
-                <table>
+                <table class="styled-table">
                     <thead>
                         <tr>
-                            <th width="30%">Ngày/Người</th>
+                            <th width="35%">Người nhập</th>
                             <th>Lý do</th>
                             <th class="text-right">Điểm</th>
-                            <th class="text-center" id="col-action-header">#</th>
                         </tr>
                     </thead>
                     <tbody id="history-body"></tbody>
