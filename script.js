@@ -202,31 +202,76 @@ window.openOptionModal = function(id, name) {
     
     const btnAdd = document.getElementById('btn-action-add');
     if (currentUser) {
-        btnAdd.style.display = 'flex'; // Sửa display block thành flex cho sheet-btn
+        btnAdd.style.display = 'flex'; 
     } else {
         btnAdd.style.display = 'none';
     }
     document.getElementById('modal-options').style.display = 'block';
 }
 
+// CẬP NHẬT: LOGIC MỞ MODAL NHẬP ĐIỂM MỚI
 window.checkPermissionAndShowAdd = function() {
     closeModal('modal-options');
     if (!currentUser) return;
     
     document.getElementById('modal-add').style.display = 'block';
+    
+    // Set info
     document.getElementById('add-student-name').innerText = document.getElementById('opt-student-name').innerText;
     document.getElementById('add-subject-tag').innerText = currentSubject.name;
     
+    // Reset inputs
     document.getElementById('score-input').value = "";
     document.getElementById('reason-input').value = "";
-    setTimeout(() => document.getElementById('score-input').focus(), 100);
+    
+    // Reset state to Plus
     setScoreType('plus');
+    
+    // Auto focus (đợi modal hiện hẳn)
+    setTimeout(() => document.getElementById('score-input').focus(), 150);
 }
 
+// CẬP NHẬT: LOGIC CHỌN LOẠI ĐIỂM (CỘNG/TRỪ)
 window.setScoreType = function(type) {
     currentScoreType = type;
-    document.getElementById('btn-plus').className = type === 'plus' ? 'type-btn active' : 'type-btn';
-    document.getElementById('btn-minus').className = type === 'minus' ? 'type-btn active' : 'type-btn';
+    const segControl = document.querySelector('.segmented-control');
+    const heroContainer = document.getElementById('hero-container');
+    const segPlus = document.getElementById('seg-plus');
+    const segMinus = document.getElementById('seg-minus');
+    const btnSave = document.querySelector('.large-save');
+
+    if (type === 'plus') {
+        segControl.classList.remove('is-minus');
+        segControl.classList.add('is-plus');
+        
+        segPlus.classList.add('active');
+        segMinus.classList.remove('active');
+        
+        heroContainer.classList.remove('minus-mode');
+        
+        // Đổi màu nút Lưu cho sinh động
+        btnSave.style.background = 'var(--success)';
+        btnSave.style.boxShadow = '0 8px 20px -6px rgba(22, 163, 74, 0.4)';
+    } else {
+        segControl.classList.remove('is-plus');
+        segControl.classList.add('is-minus');
+        
+        segPlus.classList.remove('active');
+        segMinus.classList.add('active');
+        
+        heroContainer.classList.add('minus-mode');
+        
+        // Đổi màu nút Lưu cảnh báo
+        btnSave.style.background = 'var(--danger)';
+        btnSave.style.boxShadow = '0 8px 20px -6px rgba(220, 38, 38, 0.4)';
+    }
+}
+
+// CẬP NHẬT: HÀM CHỌN ĐIỂM NHANH
+window.addQuickScore = function(val) {
+    const input = document.getElementById('score-input');
+    input.value = val;
+    input.focus();
 }
 
 window.saveScore = function() {
