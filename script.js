@@ -52,9 +52,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentSubject && document.getElementById('detail-view').style.display !== 'none') {
             renderStudentList(currentSubject);
         }
-        if(document.getElementById('modal-history').style.display === 'block') {
+        if(document.getElementById('modal-history').style.display.includes('block') || document.getElementById('modal-history').style.display.includes('flex')) {
             viewHistory();
         }
+    });
+
+    // Thêm sự kiện nhấn Enter cho ô nhập liệu đăng nhập
+    const loginInputs = [document.getElementById('login-username'), document.getElementById('password-input')];
+    loginInputs.forEach(input => {
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                performLogin();
+            }
+        });
     });
 });
 
@@ -267,13 +277,6 @@ window.setScoreType = function(type) {
     }
 }
 
-// CẬP NHẬT: HÀM CHỌN ĐIỂM NHANH
-window.addQuickScore = function(val) {
-    const input = document.getElementById('score-input');
-    input.value = val;
-    input.focus();
-}
-
 window.saveScore = function() {
     if (!currentUser) return; 
 
@@ -369,12 +372,13 @@ window.requestDelete = function(key) {
     setTimeout(() => document.getElementById('delete-reason-input').focus(), 100);
 }
 
+// CẬP NHẬT: LOGIC XÓA DÙNG TOAST THAY CHO ALERT
 window.confirmDeleteAction = function() {
     if (!pendingDeleteKey || !currentUser) return;
 
     const reason = document.getElementById('delete-reason-input').value.trim();
     if (!reason) {
-        alert("Vui lòng nhập lý do xóa (ví dụ: Nhập nhầm điểm)");
+        showToast("Vui lòng nhập lý do xóa!"); // Dùng Toast thay vì Alert
         return; 
     }
 
