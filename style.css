@@ -1,5 +1,5 @@
 :root {
-    --primary: #2563eb; /* Xanh dương hiện đại hơn */
+    --primary: #2563eb; 
     --primary-light: #eff6ff;
     --bg-body: #f8fafc;
     --surface: #ffffff;
@@ -18,7 +18,7 @@ body {
     color: var(--text-main);
 }
 
-/* HEADER - Căn chỉnh nút đăng nhập sang phải */
+/* HEADER */
 header {
     background: var(--surface);
     padding: 12px 16px;
@@ -45,7 +45,7 @@ header h3 { margin: 0; font-weight: 700; color: var(--primary); font-size: 1.1re
 main { max-width: 500px; margin: 0 auto; padding: 20px 16px; }
 .section-title { font-size: 0.8rem; text-transform: uppercase; color: var(--text-sub); margin-bottom: 12px; font-weight: 600; letter-spacing: 0.5px; }
 
-/* SUBJECT GRID - ICON ĐẸP HƠN */
+/* SUBJECT GRID */
 .subject-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .subject-card {
     background: var(--surface); padding: 20px 16px;
@@ -81,11 +81,11 @@ main { max-width: 500px; margin: 0 auto; padding: 20px 16px; }
 .s-score { font-weight: 700; font-size: 1rem; }
 .pos { color: var(--success); } .neg { color: var(--danger); } .neu { color: #ccc; }
 
-/* MODALS - Tối ưu hiệu năng, bỏ blur để đỡ lag */
+/* MODALS */
 .modal {
     display: none; position: fixed; z-index: 1000;
     left: 0; top: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Nền đen mờ nhẹ, không dùng blur */
+    background-color: rgba(0, 0, 0, 0.5);
 }
 .modal-content {
     background: var(--surface); margin: 10vh auto;
@@ -100,7 +100,7 @@ main { max-width: 500px; margin: 0 auto; padding: 20px 16px; }
 .close-btn { font-size: 24px; color: var(--text-sub); cursor: pointer; line-height: 1; }
 .modal-body { padding: 20px; }
 
-/* INPUT FORM ĐẸP HƠN */
+/* INPUT FORM */
 .form-group { margin-bottom: 16px; }
 label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-sub); margin-bottom: 8px; }
 input {
@@ -123,7 +123,7 @@ input:focus { border-color: var(--primary); }
 }
 .btn-primary:active { opacity: 0.9; }
 
-/* SHEET MENU HỌC SINH - GIỮ NGUYÊN STYLE */
+/* SHEET MENU HỌC SINH */
 .bottom-sheet-styled {
     position: absolute; bottom: 0; margin: 0; width: 100%; max-width: 100%;
     border-radius: 24px 24px 0 0;
@@ -132,7 +132,7 @@ input:focus { border-color: var(--primary); }
 .sheet-btn {
     width: 100%; padding: 16px; border: none; border-radius: 12px;
     font-size: 1rem; font-weight: 600; cursor: pointer;
-    text-align: center; /* Canh giữa chữ */
+    text-align: center;
 }
 .sheet-btn.primary { background: var(--primary); color: white; }
 .sheet-btn.secondary { background: var(--bg-body); color: var(--text-main); }
@@ -150,17 +150,25 @@ input:focus { border-color: var(--primary); }
 .btn-secondary { background: var(--bg-body); color: var(--text-main); border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; flex: 1; }
 .btn-primary { flex: 2; }
 
-/* TABLE HISTORY ĐẸP HƠN */
+/* TABLE HISTORY - UPDATED FOR DELETE */
 .table-wrapper { max-height: 50vh; overflow-y: auto; }
 .styled-table { width: 100%; border-collapse: collapse; }
-.styled-table th { text-align: left; padding: 12px; color: var(--text-sub); font-size: 0.8rem; font-weight: 600; border-bottom: 1px solid var(--border); }
+.styled-table th { text-align: left; padding: 12px; color: var(--text-sub); font-size: 0.8rem; font-weight: 600; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); }
 .styled-table td { padding: 14px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 0.9rem; }
 .styled-table tr:last-child td { border-bottom: none; }
 .user-tag { display: block; font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; }
 .date-tag { font-weight: 500; }
 .btn-del-text { color: var(--danger); background: none; border: none; font-weight: 600; font-size: 0.8rem; cursor: pointer; margin-left: 8px;}
 
-/* TOAST - Không icon */
+/* CSS cho dòng đã bị xóa */
+.row-deleted { background-color: #fef2f2; opacity: 0.8; }
+.row-deleted .s-score-cell { text-decoration: line-through; color: var(--text-sub) !important; }
+.deleted-info { 
+    display: block; font-size: 0.8rem; color: var(--danger); 
+    font-style: italic; margin-top: 4px; font-weight: 500;
+}
+
+/* TOAST */
 #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 3000; }
 .toast {
     background: #333; color: white; padding: 12px 24px; border-radius: 30px;
